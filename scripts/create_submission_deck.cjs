@@ -66,7 +66,7 @@ const slides = [
     pillars: [
       ["Forecast Demand", "Predict hourly load and evening peak-risk windows for BESCOM zones."],
       ["Detect Theft", "Flag abnormal drops, spikes, peer deviations, and tampering signals."],
-      ["Recover Revenue", "Rank inspection cases by confidence, loss impact, and urgency."],
+      ["Recover Revenue", "Rank inspection cases by confidence, loss impact, urgency, and tariff savings."],
     ],
   },
   {
@@ -93,10 +93,11 @@ const slides = [
     features: [
       ["Demand Forecasting", "Actual vs predicted load with peak warning zone."],
       ["Theft Alerts", "Critical, high, and medium risk meter anomalies."],
+      ["Karnataka Data Layer", "CSV-backed feeder profile with irrigation, solar, and evening domestic load patterns."],
       ["Bengaluru Zone Map", "Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City style zones."],
-      ["Revenue Engine", "Estimated loss, recovery potential, and zone loss chart."],
+      ["Tariff + Carbon Engine", "Monthly savings and CO2 impact from BESCOM-style optimization scenarios."],
       ["Inspection Queue", "Approve, reject, or escalate Bengaluru-area cases."],
-      ["Explainability", "Reason, formula, and audit timeline for every alert."],
+      ["Explainability", "Reason, formula, audit timeline, and officer summary prompt contract."],
     ],
   },
   {
@@ -117,9 +118,9 @@ const slides = [
     subtitle: "Frontend-first, Vercel-safe decision-support layer on top of existing BESCOM systems.",
     type: "architecture",
     layers: [
-      ["Data Layer", "Synthetic Bengaluru smart meter readings, zone load, peer groups"],
+      ["Data Layer", "Synthetic meter readings, Karnataka CSV load sample, zone load, peer groups"],
       ["AI Layer", "Precomputed forecasting, anomaly scoring, Gemini-ready explanation summaries"],
-      ["App Layer", "React dashboard, Recharts analytics, officer workflow"],
+      ["App Layer", "React dashboard, tariff engine, scenario simulator, officer workflow"],
       ["Cloud Layer", "Vercel static prototype now; Firebase/GCP-ready storage for pilot"],
     ],
   },
@@ -134,9 +135,10 @@ const slides = [
       "Recharts",
       "Framer Motion",
       "Lucide Icons",
+      "Vitest + GitHub Actions",
       "Gemini API / Google AI Studio ready",
       "Firebase / Google Cloud ready",
-      "Synthetic Bengaluru smart meter data",
+      "Synthetic Bengaluru smart meter data + Karnataka CSV sample",
     ],
     note: "Google AI model/service: Gemini is proposed for explainable alert summaries and officer-facing inspection recommendations. The live prototype keeps AI outputs precomputed in the frontend so Vercel judging clicks respond instantly without serverless timeout risk.",
   },
@@ -146,9 +148,9 @@ const slides = [
     type: "mvp",
     screens: [
       ["Command Dashboard", "Bengaluru impact metrics, simulate theft, live risk state"],
-      ["Demand Forecast", "Actual vs predicted load and peak warning"],
-      ["AI Alerts", "Meter risk, confidence, estimated loss, localized reason"],
-      ["Revenue + Queue", "Loss recovery chart and officer actions"],
+      ["Demand + Karnataka Data", "Actual vs predicted load plus localized feeder profile"],
+      ["AI Alerts + Summary", "Meter risk, confidence, estimated loss, localized reason"],
+      ["Scenario Lab", "Tariff savings, carbon impact, and officer actions"],
     ],
   },
   {
@@ -164,6 +166,7 @@ const slides = [
       "Gemini assistant for officer case summaries",
       "Firebase ingestion pipeline for masked meter events",
       "Google Maps / BESCOM zone visualization",
+      "Live BESCOM tariff and subsidy configuration management",
       "Model feedback loop from inspection outcomes",
       "Role-based audit dashboard for senior officers",
     ],

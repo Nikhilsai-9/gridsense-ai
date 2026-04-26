@@ -1,0 +1,25 @@
+hour,label,community,irrigation_kwh,solar_kwh,domestic_kwh,commercial_kwh,net_load_kwh,pattern
+0,12 AM,Kanakapura fringe cluster,5,0,14,7,26,night baseload
+1,1 AM,Kanakapura fringe cluster,5,0,12,6,23,night baseload
+2,2 AM,Kanakapura fringe cluster,4,0,11,6,21,night baseload
+3,3 AM,Kanakapura fringe cluster,4,0,10,5,19,night baseload
+4,4 AM,Kanakapura fringe cluster,6,0,11,5,22,pre-dawn ramp
+5,5 AM,Kanakapura fringe cluster,12,0,13,6,31,irrigation ramp
+6,6 AM,Kanakapura fringe cluster,24,2,17,7,46,morning irrigation spike
+7,7 AM,Kanakapura fringe cluster,28,4,18,8,50,pump load continues
+8,8 AM,Kanakapura fringe cluster,25,8,17,10,44,school and market opening
+9,9 AM,Kanakapura fringe cluster,18,12,16,12,34,mixed feeder activity
+10,10 AM,Kanakapura fringe cluster,14,18,15,13,24,solar rising
+11,11 AM,Kanakapura fringe cluster,12,24,15,14,17,noon solar support
+12,12 PM,Kanakapura fringe cluster,11,28,16,15,14,solar surplus window
+13,1 PM,Kanakapura fringe cluster,10,27,16,15,14,solar surplus window
+14,2 PM,Kanakapura fringe cluster,10,24,17,15,18,light industrial recovery
+15,3 PM,Kanakapura fringe cluster,12,18,18,16,28,afternoon rebound
+16,4 PM,Kanakapura fringe cluster,14,12,21,17,40,domestic ramp
+17,5 PM,Kanakapura fringe cluster,16,7,26,18,53,early evening demand
+18,6 PM,Kanakapura fringe cluster,18,3,31,18,64,evening feeder stress
+19,7 PM,Kanakapura fringe cluster,12,1,39,19,69,domestic peak
+20,8 PM,Kanakapura fringe cluster,8,0,41,18,67,domestic peak
+21,9 PM,Kanakapura fringe cluster,6,0,37,16,59,late evening taper
+22,10 PM,Kanakapura fringe cluster,5,0,29,13,47,night taper
+23,11 PM,Kanakapura fringe cluster,5,0,21,10,36,late night normalization

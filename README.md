@@ -1,54 +1,67 @@
-﻿# GridSense AI
+# GridSense AI
 
 **Smart Meter Intelligence & Revenue Recovery System for BESCOM**
 
-GridSense AI is a polished React/Vite prototype for **AI for Bharat Hackathon** under **Theme 8: AI for Smart Meter Intelligence & Loss Detection by BESCOM**. It is localized for Bengaluru/BESCOM operations and demonstrates how smart meter readings can become theft alerts, demand forecasts, inspection priorities, and revenue recovery decisions.
+GridSense AI is a polished React/Vite prototype for **AI for Bharat Hackathon** under **Theme 8: AI for Smart Meter Intelligence & Loss Detection by BESCOM**. It is designed as a decision-support platform for BESCOM officers and now includes stronger Karnataka-localized data grounding, a BESCOM-style tariff engine, a carbon impact view, and a browser-native scenario simulator.
 
 ## Problem Statement
 
-Electricity distribution utilities receive large volumes of smart meter readings, but officers still need faster ways to identify abnormal usage, power theft, feeder stress, and revenue loss risk. Manual review is slow, false positives can be costly, and high-impact theft cases may remain hidden inside raw meter data.
+Utilities already receive smart meter readings at scale, but raw telemetry alone does not tell officers where to act first. Power theft, tampering, feeder stress, and revenue leakage are hidden inside large volumes of data, while manual review is slow and often too late for practical recovery.
 
-For Bengaluru and Karnataka utilities, the problem is also local: dense residential evening peaks, industrial feeder patterns, and zone-specific loss risks require practical field prioritization instead of generic analytics.
+For Bengaluru and Karnataka distribution settings, the problem is also local:
+
+- residential evening peaks create feeder stress
+- semi-rural pump and irrigation demand can distort normal load patterns
+- rooftop solar changes midday behavior
+- field teams need ranked inspections, not just charts
 
 ## Proposed Solution
 
-GridSense AI acts as an intelligent decision-support dashboard on top of existing smart meter systems. It uses synthetic Bengaluru-style meter data to demonstrate:
+GridSense AI works as an intelligent decision-support layer on top of existing BESCOM-style infrastructure. The prototype demonstrates how synthetic meter data can be converted into:
 
-- Hourly electricity demand forecasting
-- Theft and anomaly detection
-- Bengaluru zone-level grid risk scoring
-- Estimated revenue loss and recovery potential
-- Inspection priority queue for officers
-- Explainable AI evidence for each alert
-- Audit-ready human review workflow
+- demand forecasting
+- theft and anomaly detection
+- zone-level risk scoring
+- explainable AI officer summaries
+- revenue impact estimation
+- inspection prioritization
+- tariff and carbon scenario planning
 
-The prototype is intentionally frontend-first and precomputed for demo reliability. Judges get instant results on Vercel because no long-running serverless AI function is required during the live click path.
+The app remains frontend-first and Vercel-safe. All live demo interactions are precomputed in the browser, so judges get instant feedback without waiting on long-running hosted AI calls.
+
+## What Is New In This Version
+
+- **Karnataka Data Layer:** Added `public/data/karnataka_village_sample.csv` with irrigation ramps, noon solar support, and evening domestic peaks.
+- **BESCOM Tariff Engine:** Added slab-based monthly savings calculations in [tariffEngine.js](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/src/lib/tariffEngine.js).
+- **Carbon Impact Panel:** Added CO2 savings using an India grid emission factor model.
+- **Scenario Simulator:** Added slider-based solar, battery, and shiftable-load controls with instant rupee recalculation.
+- **AI Officer Summary:** Added a structured in-browser summary flow that mirrors a production Gemini-style prompt contract.
+- **CI + Tests:** Added Vitest coverage for tariff logic and a GitHub Actions workflow.
 
 ## Key Features
 
-- **Bengaluru Localization:** Simulated zones are framed around Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City feeder patterns.
+- **Bengaluru Localization:** Zones are framed around Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City style feeder patterns.
+- **Karnataka CSV Profile:** The dashboard now references a localized feeder sample rather than generic dashboard-only mock values.
 - **Demand Forecasting:** Predicts peak load windows and feeder stress using hourly demand patterns.
-- **AI Theft & Anomaly Alerts:** Flags sudden drops, irregular spikes, peer-group deviations, and possible bypass/tampering behavior.
-- **Zone Intelligence:** Shows zone-level risk, load, anomalies, and recommended action.
-- **Meter Investigation Panel:** Explains why a specific meter was flagged with usage charts and anomaly points.
-- **Revenue Impact Engine:** Estimates detected loss, potential recovery, average loss per high-risk meter, and monthly projected savings.
-- **Inspection Priority Queue:** Lets officers approve, reject, or escalate cases.
-- **Explainability & Audit:** Shows the reason, formula, and timeline behind an AI decision.
-- **Human-in-the-Loop Review:** Keeps final action with authorized BESCOM officers.
-- **Vercel-Safe Demo:** Precomputed frontend AI outputs avoid 60-second serverless timeout risk.
-- **Synthetic Data Only:** No personal, consumer, or official BESCOM data is used.
+- **Theft and Anomaly Detection:** Flags sudden drops, irregular spikes, peer-group deviations, and bypass-style risk.
+- **AI Officer Summary:** Uses a structured BESCOM/Gemini-ready prompt contract for explainable case summaries.
+- **Revenue Impact Engine:** Estimates detected loss, recovery potential, and savings opportunity.
+- **Scenario Lab:** Models monthly outcomes from solar capacity, battery size, and flexible load improvements.
+- **Carbon Signal:** Converts energy savings into CO2 avoided and rough tree-equivalent impact.
+- **Inspection Queue:** Lets officers approve, reject, or escalate cases.
+- **Explainability and Audit:** Preserves the reason, formula, and event timeline behind a flag.
+- **Human-in-the-Loop Workflow:** Final decisions remain with authorized officers.
 
 ## Google AI Usage
 
-The prototype uses simulated AI logic for safe, instant demonstration. In a production pilot, **Gemini / Google AI Studio** can generate officer-facing explanations from structured anomaly evidence, such as:
+The current prototype uses **simulated AI logic** for reliable frontend-only judging. A production version can connect the prompt contract in [prompts.js](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/src/lib/prompts.js) to **Gemini / Google AI Studio** for:
 
-- Why a meter was flagged
-- What peer-group deviation was detected
-- Estimated revenue loss summary
-- Recommended inspection priority
-- Human-review note for audit trail
+- officer-facing case summaries
+- structured JSON explanations
+- inspection recommendation notes
+- audit-friendly reasoning outputs
 
-This keeps the live hackathon demo reliable while showing a clear Google AI integration path.
+This keeps the live demo fast while showing a clear Google AI integration path.
 
 ## Tech Stack
 
@@ -57,21 +70,22 @@ This keeps the live hackathon demo reliable while showing a clear Google AI inte
 - Tailwind CSS
 - Recharts
 - Framer Motion
-- Lucide React icons
-- Gemini / Google AI Studio ready
-- Synthetic/mock frontend data
+- Lucide React
+- Vitest
+- GitHub Actions
+- Synthetic frontend data + localized CSV sample
 
 ## Demo Workflow
 
 1. Open the GridSense AI dashboard.
-2. Show the Bengaluru/BESCOM impact metrics and revenue loss problem.
-3. Show the demand forecasting chart and peak load prediction.
+2. Show the impact metrics and explain BESCOM's loss-detection challenge.
+3. Show the demand forecast and the Karnataka feeder sample curve.
 4. Click **Simulate Theft**.
-5. A new Zone C anomaly appears for meter `BES-7710`.
-6. High-risk meter count, estimated loss, Zone C risk, and inspection queue update instantly.
-7. Show why `BES-2048` was flagged using explainability cards and the audit timeline.
-8. Approve an inspection from the priority queue.
-9. Explain that the system is localized, human-in-the-loop, auditable, and deployable without modifying existing BESCOM systems.
+5. Show the new alert, updated queue, and stronger Zone C risk state.
+6. Open the AI officer summary and explain how the case is described in structured operational language.
+7. Move to the **Scenario Simulator** and change solar, battery, or shiftable load.
+8. Show how monthly bill savings and carbon impact update instantly.
+9. End on the human-in-the-loop and deployment-readiness sections.
 
 ## How to Run Locally
 
@@ -80,10 +94,16 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite, usually:
+Open the Vite URL, usually:
 
 ```txt
 http://localhost:5173
+```
+
+Run tests:
+
+```bash
+npm run test
 ```
 
 Create a production build:
@@ -92,29 +112,27 @@ Create a production build:
 npm run build
 ```
 
-Preview the production build:
-
-```bash
-npm run preview
-```
-
 ## Deployment Note
 
 This project is ready to deploy on Vercel.
 
-Recommended Vercel settings:
-
-- Framework preset: **Vite**
+- Framework preset: `Vite`
 - Build command: `npm run build`
 - Output directory: `dist`
 
-The core demo is frontend-only and precomputed, so it does not depend on a slow backend request or Vercel serverless function during judging.
+The main demo path is frontend-only and precomputed, so it avoids judge-facing timeout risk.
+
+## Verification
+
+- `npm run test` passes
+- `npm run build` passes
+- GitHub Actions workflow added at [.github/workflows/ci.yml](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/.github/workflows/ci.yml)
 
 ## Synthetic Data Disclaimer
 
-This prototype uses synthetic/mock smart meter, demand, anomaly, revenue, and inspection data for hackathon demonstration only. It does not contain real consumer data, raw PII, or official BESCOM operational records.
+This prototype uses synthetic and masked demonstration data only. It does not include real customer records, raw PII, or official BESCOM operational telemetry.
 
-GridSense AI is not an official BESCOM product. It is a hackathon prototype designed to demonstrate an explainable AI decision-support workflow for smart meter intelligence and revenue recovery.
+GridSense AI is not an official BESCOM product. It is a hackathon prototype built to demonstrate explainable AI-assisted decision support for smart meter intelligence and revenue recovery.
 
 ## Repository
 

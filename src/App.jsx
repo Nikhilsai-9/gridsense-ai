@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { animate, motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
+  BatteryCharging,
   BadgeCheck,
   Bell,
   Brain,
@@ -17,6 +18,7 @@ import {
   Cloud,
   Clock3,
   IndianRupee,
+  Leaf,
   Layers3,
   Linkedin,
   LineChart as LineChartIcon,
@@ -31,8 +33,10 @@ import {
   SearchCheck,
   ShieldAlert,
   ShieldCheck,
+  SlidersHorizontal,
   Siren,
   Sparkles,
+  SunMedium,
   Target,
   TrendingUp,
   UserCheck,
@@ -53,8 +57,20 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { buildLoadCurve, parseCsvRows, summarizeVillageData } from "./lib/karnatakaData";
+import { buildOfficerSummaryPrompt, createMockOfficerSummary } from "./lib/prompts";
+import { estimateScenarioImpact, formatRupees } from "./lib/tariffEngine";
 
 const rupee = new Intl.NumberFormat("en-IN");
+const currency = "\u20B9";
+const defaultVillageSummary = {
+  baseMonthlyUnits: 1860,
+  peakHour: "7 PM",
+  peakLoad: 69,
+  solarSurplusHour: "12 PM",
+  solarSurplus: 28,
+  summaryText: "The Karnataka feeder sample shows irrigation-led morning ramps, strong noon solar relief, and a domestic evening peak.",
+};
 
 const demandData = [
   { time: "6 AM", actual: 4.2, predicted: 4.4 },
@@ -239,6 +255,7 @@ const auditTimeline = [
 const navLinks = [
   ["Dashboard", "dashboard"],
   ["Forecast", "forecast"],
+  ["Scenario", "simulator"],
   ["Alerts", "alerts"],
   ["Revenue", "revenue"],
   ["Audit", "audit"],
@@ -466,7 +483,7 @@ function HeroVisual({ simulated }) {
         </div>
         <div>
           <p className="text-xs text-slate-500">Revenue impact</p>
-          <p className="text-2xl font-black text-slate-950">₹{simulated ? "2.62L" : "2.4L"}</p>
+          <p className="text-2xl font-black text-slate-950">Rs {simulated ? "2.62L" : "2.4L"}</p>
         </div>
         <div>
           <p className="text-xs text-slate-500">Priority</p>
@@ -502,7 +519,7 @@ function Hero({ onSimulate, simulated }) {
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
           <Badge tone="blue">
             <Building2 className="h-3.5 w-3.5" />
-            Theme 8 · BESCOM + Bengaluru/Karnataka localized
+            Theme 8  |  BESCOM + Bengaluru/Karnataka localized
           </Badge>
           <h1 className="mt-5 text-5xl font-black tracking-normal text-slate-950 md:text-7xl">GridSense AI</h1>
           <p className="mt-5 max-w-3xl text-xl font-semibold leading-8 text-slate-700 md:text-2xl">
@@ -554,7 +571,7 @@ function ImpactMetrics({ simulated }) {
     ["Total Smart Meters", 12480, "", "", Gauge, "blue"],
     ["Predicted Peak Load", simulated ? 9.1 : 8.7, "", " MW", TrendingUp, "orange", 1],
     ["High-Risk Meters", simulated ? 21 : 18, "", "", ShieldAlert, "red"],
-    ["Estimated Loss Detected", simulated ? 2.62 : 2.4, "₹", "L", IndianRupee, "green", 2],
+    ["Estimated Loss Detected", simulated ? 2.62 : 2.4, "Rs ", "L", IndianRupee, "green", 2],
     ["AI Confidence", simulated ? 94 : 92, "", "%", Brain, "blue"],
     ["Inspection Priority Cases", simulated ? 8 : 7, "", "", ClipboardCheck, "orange"],
   ];
@@ -691,6 +708,271 @@ function DemandForecast({ simulated }) {
   );
 }
 
+function KarnatakaDatasetSection({ rowCount, summary, curve }) {
+  const insightCards = [
+    ["Community sample", rowCount ? `${rowCount} hourly rows loaded` : "Fallback profile active", Database, "blue"],
+    ["Morning pump peak", `${summary.peakHour} peak at ${summary.peakLoad} kWh`, Gauge, "orange"],
+    ["Noon solar relief", `${summary.solarSurplusHour} solar support ${summary.solarSurplus} kWh`, SunMedium, "green"],
+    ["India-first grounding", "Karnataka-style irrigation, solar, and evening domestic load", Map, "red"],
+  ];
+
+  return (
+    <section className="section-pad bg-slate-50">
+      <SectionHeader eyebrow="Localized Data Layer" title="Karnataka feeder sample behind the demo">
+        The prototype now carries a structured Karnataka load profile so the story feels regional, not generic. It captures morning irrigation ramps, noon solar relief, and evening household peaks.
+      </SectionHeader>
+      <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="card p-5 md:p-6">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="text-xl font-black text-slate-950">Karnataka village sample curve</h3>
+              <p className="mt-1 text-sm text-slate-500">Net feeder load compared with solar support from the CSV profile</p>
+            </div>
+            <Badge tone="blue">/public/data/karnataka_village_sample.csv</Badge>
+          </div>
+          <div className="h-[340px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={curve} margin={{ top: 12, right: 16, bottom: 0, left: -18 }}>
+                <CartesianGrid stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} unit=" kWh" />
+                <Tooltip content={<ChartTooltip />} />
+                <Line type="monotone" dataKey="total" name="Net feeder load" stroke="#f97316" strokeWidth={4} dot={{ r: 4, fill: "#f97316", strokeWidth: 0 }} />
+                <Line type="monotone" dataKey="solar" name="Solar support" stroke="#2563eb" strokeWidth={4} strokeDasharray="8 7" dot={{ r: 4, fill: "#2563eb", strokeWidth: 0 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+          {insightCards.map(([label, value, Icon, tone]) => (
+            <div key={label} className="card p-5">
+              <span
+                className={cn(
+                  "grid h-11 w-11 place-items-center rounded-2xl",
+                  tone === "blue" && "bg-blue-50 text-blue-700",
+                  tone === "orange" && "bg-orange-50 text-orange-700",
+                  tone === "green" && "bg-emerald-50 text-emerald-700",
+                  tone === "red" && "bg-red-50 text-red-700",
+                )}
+              >
+                <Icon className="h-5 w-5" />
+              </span>
+              <p className="mt-4 text-sm font-semibold text-slate-500">{label}</p>
+              <p className="mt-2 text-lg font-black leading-7 text-slate-950">{value}</p>
+            </div>
+          ))}
+          <div className="highlight-card p-5">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Why this matters</p>
+            <p className="mt-3 text-base font-semibold leading-7 text-slate-700">{summary.summaryText}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AISummarySection({ summary, promptPreview, visibleCount }) {
+  const streamLines = [
+    summary.headline,
+    `Inspection priority: ${summary.inspectionPriority}`,
+    `Estimated loss impact: ${currency}${rupee.format(summary.estimatedLossInr)}`,
+    `Carbon-linked efficiency opportunity: ${summary.carbonImpactKg.toFixed(0)} kg CO2`,
+    ...summary.rationale,
+    summary.officerNote,
+  ];
+
+  return (
+    <section id="analysis" className="section-pad bg-white">
+      <SectionHeader eyebrow="AI Officer Summary" title="Fast, judge-safe analysis without backend timeout">
+        Instead of waiting on a slow hosted model, the prototype streams a structured officer note in-browser. The same prompt contract can later be connected to Gemini or any secure utility LLM endpoint.
+      </SectionHeader>
+      <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+        <div className="card p-6">
+          <div className="flex items-center gap-3">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-blue-700">
+              <Brain className="h-6 w-6" />
+            </span>
+            <div>
+              <h3 className="font-black text-slate-950">Prompt contract</h3>
+              <p className="text-sm text-slate-500">BESCOM, PM-KUSUM, DDUGJY, strict JSON</p>
+            </div>
+          </div>
+          <div className="mt-5 rounded-3xl bg-slate-950 p-4 text-xs leading-6 text-sky-100">
+            <pre className="overflow-auto whitespace-pre-wrap font-mono">{promptPreview}</pre>
+          </div>
+        </div>
+        <div className="card p-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-xl font-black text-slate-950">Officer-facing streamed note</h3>
+              <p className="mt-1 text-sm text-slate-500">Structured summary for queue review and field planning</p>
+            </div>
+            <Badge tone={summary.riskLevel === "Critical" ? "red" : "orange"}>{summary.riskLevel}</Badge>
+          </div>
+          <div className="mt-5 rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+            <div className="space-y-3">
+              {streamLines.slice(0, visibleCount).map((line, index) => (
+                <motion.div
+                  key={`${index}-${line}`}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold leading-6 text-slate-700"
+                >
+                  {line}
+                </motion.div>
+              ))}
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {summary.policyContext.map((item) => (
+                <div key={item} className="rounded-2xl bg-blue-50 px-4 py-3 text-sm font-bold leading-6 text-blue-900">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ScenarioSlider({ label, value, min, max, step, suffix = "", onChange }) {
+  return (
+    <label className="block">
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-sm font-black text-slate-950">{label}</span>
+        <span className="text-sm font-semibold text-slate-500">
+          {value}
+          {suffix}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-700"
+      />
+    </label>
+  );
+}
+
+function ScenarioSimulatorSection({ scenario, onScenarioChange, impact }) {
+  const chartData = [
+    { label: "Baseline units", value: Math.round(impact.baselineUnits), fill: "#0f172a" },
+    { label: "Solar offset", value: Math.round(impact.solarOffsetUnits), fill: "#2563eb" },
+    { label: "Battery recovery", value: Math.round(impact.batteryRecoveryUnits), fill: "#f97316" },
+    { label: "Shift optimization", value: Math.round(impact.shiftableOptimizationUnits), fill: "#059669" },
+    { label: "Optimized units", value: Math.round(impact.optimizedUnits), fill: "#dc2626" },
+  ];
+
+  return (
+    <section id="simulator" className="section-pad bg-slate-50">
+      <SectionHeader eyebrow="Scenario Simulator" title="Tariff, carbon, and resilience in one control panel">
+        This turns the dashboard into a working decision lab. Officers or judges can change solar capacity, battery support, and shiftable load, then watch monthly rupee savings and carbon impact update instantly in the browser.
+      </SectionHeader>
+      <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[0.78fr_1.22fr]">
+        <div className="card p-6">
+          <div className="flex items-center gap-3">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-50 text-orange-700">
+              <SlidersHorizontal className="h-6 w-6" />
+            </span>
+            <div>
+              <h3 className="font-black text-slate-950">BESCOM scenario controls</h3>
+              <p className="text-sm text-slate-500">Demo slab engine with localized feeder assumptions</p>
+            </div>
+          </div>
+          <div className="mt-6 space-y-6">
+            <ScenarioSlider
+              label="Solar capacity"
+              value={scenario.solarKw}
+              min={0}
+              max={80}
+              step={2}
+              suffix=" kW"
+              onChange={(value) => onScenarioChange("solarKw", value)}
+            />
+            <ScenarioSlider
+              label="Battery size"
+              value={scenario.batteryKwh}
+              min={0}
+              max={120}
+              step={5}
+              suffix=" kWh"
+              onChange={(value) => onScenarioChange("batteryKwh", value)}
+            />
+            <ScenarioSlider
+              label="Shiftable load"
+              value={scenario.shiftableLoadPct}
+              min={0}
+              max={40}
+              step={1}
+              suffix="%"
+              onChange={(value) => onScenarioChange("shiftableLoadPct", value)}
+            />
+          </div>
+          <div className="mt-6 rounded-3xl border border-blue-200 bg-blue-50 p-5">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Tariff logic</p>
+            <p className="mt-3 text-sm font-semibold leading-7 text-slate-700">
+              Demo BESCOM slab assumptions: first 50 units free, then Rs 3.15, Rs 6.00, Rs 7.10, and Rs 7.45 per kWh across higher slabs.
+            </p>
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <ImpactTile label="Baseline monthly bill" value={formatRupees(impact.baselineTariff.totalCost)} icon={IndianRupee} tone="blue" />
+            <ImpactTile label="Optimized monthly bill" value={formatRupees(impact.optimizedTariff.totalCost)} icon={BatteryCharging} tone="orange" />
+            <ImpactTile label="Monthly savings" value={formatRupees(impact.rupeeSavings)} icon={Target} tone="green" />
+            <ImpactTile label="Carbon avoided" value={`${impact.carbonSavedKg.toFixed(0)} kg`} icon={Leaf} tone="red" />
+          </div>
+          <div className="card p-5 md:p-6">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-black text-slate-950">Scenario outcome</h3>
+                <p className="mt-1 text-sm text-slate-500">Monthly unit movement after solar, battery, and flexible-load changes</p>
+              </div>
+              <Badge tone="green">{impact.treeEquivalent.toFixed(1)} trees equivalent</Badge>
+            </div>
+            <div className="h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 12, right: 12, bottom: 8, left: -14 }}>
+                  <CartesianGrid stroke="#e2e8f0" vertical={false} />
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+                  <Tooltip content={<RevenueTooltip />} />
+                  <Bar dataKey="value" radius={[14, 14, 4, 4]}>
+                    {chartData.map((entry) => (
+                      <Cell key={entry.label} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-semibold text-slate-500">Units saved</p>
+                <p className="mt-1 text-xl font-black text-slate-950">{Math.round(impact.unitsSaved)} kWh</p>
+              </div>
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-semibold text-slate-500">Solar contribution</p>
+                <p className="mt-1 text-xl font-black text-blue-700">{Math.round(impact.solarOffsetUnits)} kWh</p>
+              </div>
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-semibold text-slate-500">Battery + flexible load</p>
+                <p className="mt-1 text-xl font-black text-orange-600">
+                  {Math.round(impact.batteryRecoveryUnits + impact.shiftableOptimizationUnits)} kWh
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
@@ -722,12 +1004,12 @@ function AlertCard({ alert, index }) {
         <span className={cn("rounded-full px-3 py-1 text-xs font-black ring-1", riskClass[alert.risk])}>{alert.risk}</span>
       </div>
       <h3 className="mt-5 text-xl font-black text-slate-950">Meter ID: {alert.meterId}</h3>
-      <p className="mt-1 text-sm font-semibold text-slate-500">{alert.zone} · {alert.issue}</p>
+      <p className="mt-1 text-sm font-semibold text-slate-500">{alert.zone}  |  {alert.issue}</p>
       <p className="mt-4 text-sm leading-6 text-slate-600">Reason: {alert.reason}</p>
       <div className="mt-5 grid grid-cols-2 gap-3">
         <div className="rounded-2xl bg-slate-50 p-4">
           <p className="text-xs font-semibold text-slate-500">Estimated Loss</p>
-          <p className="mt-1 text-xl font-black text-slate-950">₹{rupee.format(alert.loss)}</p>
+          <p className="mt-1 text-xl font-black text-slate-950">Rs {rupee.format(alert.loss)}</p>
         </div>
         <div className="rounded-2xl bg-slate-50 p-4">
           <p className="text-xs font-semibold text-slate-500">Confidence</p>
@@ -867,7 +1149,7 @@ function MeterInvestigation({ status, onStatus }) {
           <div className="mt-6 space-y-3">
             <InfoRow label="Current Status" value="High Risk" />
             <InfoRow label="AI Confidence" value="94%" />
-            <InfoRow label="Estimated Revenue Loss" value="₹18,500" />
+            <InfoRow label="Estimated Revenue Loss" value="Rs 18,500" />
             <InfoRow label="Recommended Action" value="Field inspection within 24 hours" />
           </div>
         </div>
@@ -945,10 +1227,10 @@ function RevenueImpact({ simulated }) {
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <ImpactTile label="Total estimated loss detected" value={`₹${totalLoss}L`} icon={IndianRupee} tone="red" />
-            <ImpactTile label="Potential recovery after inspection" value={`₹${recovery}L`} icon={Target} tone="green" />
-            <ImpactTile label="Average loss per high-risk meter" value="₹13,300" icon={Gauge} tone="orange" />
-            <ImpactTile label="Monthly projected savings" value="₹18.6L" icon={TrendingUp} tone="blue" />
+            <ImpactTile label="Total estimated loss detected" value={`Rs ${totalLoss}L`} icon={IndianRupee} tone="red" />
+            <ImpactTile label="Potential recovery after inspection" value={`Rs ${recovery}L`} icon={Target} tone="green" />
+            <ImpactTile label="Average loss per high-risk meter" value="Rs 13,300" icon={Gauge} tone="orange" />
+            <ImpactTile label="Monthly projected savings" value="Rs 18.6L" icon={TrendingUp} tone="blue" />
           </div>
           <div className="highlight-card p-6">
             <p className="text-lg font-black leading-8 text-slate-900">
@@ -965,7 +1247,7 @@ function RevenueImpact({ simulated }) {
               <BarChart data={data} margin={{ top: 12, right: 16, bottom: 0, left: -10 }}>
                 <CartesianGrid stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="zone" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} tickFormatter={(value) => `₹${Math.round(value / 1000)}k`} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} tickFormatter={(value) => `Rs ${Math.round(value / 1000)}k`} />
                 <Tooltip content={<RevenueTooltip />} />
                 <Bar dataKey="loss" radius={[14, 14, 4, 4]}>
                   {data.map((entry) => (
@@ -986,7 +1268,7 @@ function RevenueTooltip({ active, payload, label }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-command">
       <p className="font-black text-slate-950">{label}</p>
-      <p className="text-sm font-semibold text-slate-600">Estimated Loss: ₹{rupee.format(payload[0].value)}</p>
+      <p className="text-sm font-semibold text-slate-600">Estimated Loss: Rs {rupee.format(payload[0].value)}</p>
     </div>
   );
 }
@@ -1034,7 +1316,7 @@ function InspectionQueue({ rows, onDecision }) {
                   <td className="px-5 py-4 font-black text-slate-950">{row.meterId}</td>
                   <td className="px-5 py-4 font-semibold text-slate-600">{row.zone}</td>
                   <td className="px-5 py-4 text-slate-600">{row.issue}</td>
-                  <td className="px-5 py-4 font-black text-slate-950">₹{rupee.format(row.loss)}</td>
+                  <td className="px-5 py-4 font-black text-slate-950">Rs {rupee.format(row.loss)}</td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <span className="font-black text-blue-700">{row.confidence}%</span>
@@ -1185,17 +1467,19 @@ function HumanLoopReview() {
 function LocalReadinessSection() {
   const readiness = [
     ["Bengaluru localized", "Synthetic feeder zones map to Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City patterns.", Map],
+    ["Karnataka data grounded", "A structured CSV profile now captures irrigation peaks, noon solar relief, and evening domestic load.", Database],
     ["Vercel-safe demo", "All AI outputs are precomputed in the frontend, so judge clicks return instantly without serverless timeout risk.", Clock3],
     ["Gemini-ready", "Gemini / Google AI Studio can generate officer-facing case summaries from anomaly evidence in a pilot.", Brain],
+    ["Tariff engine", "BESCOM-style slab calculations now translate grid intelligence into monthly rupee savings.", IndianRupee],
     ["Karnataka scale path", "The same risk scoring flow can extend to additional BESCOM circles and rural Karnataka feeders.", Cloud],
-  ];
+      ];
 
   return (
     <section className="section-pad bg-white">
       <SectionHeader eyebrow="Judge Feedback Upgrades" title="Localized, reliable, and Google AI-ready">
         Built to avoid the most common prototype penalties: unclear local relevance, slow cloud functions, and vague AI usage.
       </SectionHeader>
-      <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-2 xl:grid-cols-3">
         {readiness.map(([title, copy, Icon]) => (
           <div key={title} className="card p-5">
             <span className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-50 text-orange-700">
@@ -1282,7 +1566,7 @@ function FinalImpact({ onSimulate }) {
               into demand forecasts, theft alerts, inspection priorities, and revenue recovery decisions.
             </p>
             <p className="mt-5 rounded-3xl border border-orange-300/30 bg-orange-400/10 p-5 text-xl font-black leading-8 text-white">
-              From smart meters to smart decisions — helping utilities detect loss, predict demand, and recover revenue.
+              From smart meters to smart decisions  -  helping utilities detect loss, predict demand, and recover revenue.
             </p>
             <button type="button" onClick={onSimulate} className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-orange-400 px-5 py-3 text-sm font-black text-slate-950 shadow-orangeGlow transition hover:-translate-y-0.5 hover:bg-white">
               <Siren className="h-4 w-4" />
@@ -1309,13 +1593,14 @@ function SiteFooter() {
   const quickLinks = [
     ["Dashboard", "dashboard"],
     ["Demand Forecasting", "forecast"],
+    ["Scenario Lab", "simulator"],
     ["Theft Detection", "alerts"],
     ["Zone Intelligence", "zones"],
     ["Inspection Queue", "queue"],
     ["Explainability", "audit"],
     ["Impact", "impact"],
   ];
-  const techStack = ["React", "Tailwind CSS", "Recharts", "Framer Motion", "Lucide Icons", "Synthetic Data"];
+  const techStack = ["React", "Tailwind CSS", "Recharts", "Framer Motion", "Lucide Icons", "CSV Data", "Vitest", "Synthetic Data"];
   const projectLinks = [
     ["GitHub", "https://github.com/Nikhilsai-9", Github],
     ["LinkedIn", "https://www.linkedin.com/in/nikhilsai-kenguri-0b0976322", Linkedin],
@@ -1341,7 +1626,7 @@ function SiteFooter() {
               </div>
             </div>
             <p className="mt-6 max-w-xl text-sm leading-7 text-slate-300">
-              Built for AI for Bharat Hackathon — Theme 8. GridSense AI localizes smart meter intelligence for
+              Built for AI for Bharat Hackathon  -  Theme 8. GridSense AI localizes smart meter intelligence for
               Bengaluru/BESCOM operations, transforming meter data into theft alerts, demand forecasts, inspection
               priorities, and revenue recovery decisions.
             </p>
@@ -1393,7 +1678,7 @@ function SiteFooter() {
               <div>
                 <p className="font-black text-white">AI for Bharat Hackathon 2026</p>
                 <p className="mt-1 text-sm font-semibold leading-6 text-orange-100">
-                  Theme 8 — AI for Smart Meter Intelligence & Loss Detection by BESCOM, localized for Bengaluru/Karnataka
+                  Theme 8  -  AI for Smart Meter Intelligence & Loss Detection by BESCOM, localized for Bengaluru/Karnataka
                 </p>
                 <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-sky-200">
                   Prototype uses synthetic data only.
@@ -1404,7 +1689,7 @@ function SiteFooter() {
 
           <div className="text-sm leading-7 text-slate-300 lg:text-right">
             <p className="font-semibold text-slate-200">
-              © 2026 GridSense AI. Built for hackathon demonstration and decision-support research.
+              (C) 2026 GridSense AI. Built for hackathon demonstration and decision-support research.
             </p>
             <p className="mt-2 text-xs leading-6 text-slate-400">
               Not an official BESCOM product. Prototype created using synthetic data for innovation challenge submission.
@@ -1420,9 +1705,45 @@ export default function App() {
   const [simulated, setSimulated] = useState(false);
   const [queueRows, setQueueRows] = useState(baseQueue);
   const [investigationStatus, setInvestigationStatus] = useState("High Risk");
+  const [villageRows, setVillageRows] = useState([]);
+  const [scenario, setScenario] = useState({
+    solarKw: 24,
+    batteryKwh: 35,
+    shiftableLoadPct: 18,
+  });
+  const [visibleSummaryCount, setVisibleSummaryCount] = useState(0);
   const [toast, setToast] = useState(null);
 
   const alerts = useMemo(() => (simulated ? [simulatedAlert, ...baseAlerts] : baseAlerts), [simulated]);
+  const villageSummary = useMemo(
+    () => (villageRows.length ? summarizeVillageData(villageRows) : defaultVillageSummary),
+    [villageRows],
+  );
+  const villageCurve = useMemo(
+    () =>
+      villageRows.length
+        ? buildLoadCurve(villageRows)
+        : [
+            { time: "6 AM", total: 46, solar: 2 },
+            { time: "9 AM", total: 34, solar: 12 },
+            { time: "12 PM", total: 14, solar: 28 },
+            { time: "3 PM", total: 28, solar: 18 },
+            { time: "6 PM", total: 64, solar: 3 },
+            { time: "9 PM", total: 59, solar: 0 },
+            { time: "12 AM", total: 26, solar: 0 },
+          ],
+    [villageRows],
+  );
+  const scenarioImpact = useMemo(
+    () =>
+      estimateScenarioImpact({
+        baseMonthlyUnits: villageSummary.baseMonthlyUnits,
+        solarKw: scenario.solarKw,
+        batteryKwh: scenario.batteryKwh,
+        shiftableLoadPct: scenario.shiftableLoadPct,
+      }),
+    [scenario, villageSummary.baseMonthlyUnits],
+  );
 
   const zones = useMemo(
     () =>
@@ -1438,6 +1759,71 @@ export default function App() {
       }),
     [simulated],
   );
+  const officerSummary = useMemo(
+    () =>
+      createMockOfficerSummary({
+        meterId: "BES-2048",
+        zone: "Zone C",
+        issue: simulated ? simulatedAlert.issue : baseAlerts[0].issue,
+        confidence: simulated ? simulatedAlert.confidence : baseAlerts[0].confidence,
+        estimatedLossInr: simulated ? simulatedAlert.loss : baseAlerts[0].loss,
+        datasetSummary: villageSummary.summaryText,
+        tariffSavingsInr: scenarioImpact.rupeeSavings,
+        carbonImpactKg: scenarioImpact.carbonSavedKg,
+        simulated,
+      }),
+    [scenarioImpact.carbonSavedKg, scenarioImpact.rupeeSavings, simulated, villageSummary.summaryText],
+  );
+  const promptPreview = useMemo(
+    () =>
+      buildOfficerSummaryPrompt({
+        meterId: "BES-2048",
+        zone: "Zone C",
+        issue: simulated ? simulatedAlert.issue : baseAlerts[0].issue,
+        confidence: simulated ? simulatedAlert.confidence : baseAlerts[0].confidence,
+        estimatedLossInr: simulated ? simulatedAlert.loss : baseAlerts[0].loss,
+        location: "Peenya Industrial Area",
+        datasetSummary: villageSummary.summaryText,
+        tariffSavingsInr: scenarioImpact.rupeeSavings,
+        carbonImpactKg: scenarioImpact.carbonSavedKg,
+      }),
+    [scenarioImpact.carbonSavedKg, scenarioImpact.rupeeSavings, simulated, villageSummary.summaryText],
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/data/karnataka_village_sample.csv")
+      .then((response) => response.text())
+      .then((csvText) => {
+        if (!active) return;
+        setVillageRows(parseCsvRows(csvText));
+      })
+      .catch(() => {
+        if (!active) return;
+        setVillageRows([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const streamLength = 6 + officerSummary.rationale.length;
+    setVisibleSummaryCount(1);
+    const interval = window.setInterval(() => {
+      setVisibleSummaryCount((current) => {
+        if (current >= streamLength) {
+          window.clearInterval(interval);
+          return current;
+        }
+        return current + 1;
+      });
+    }, 220);
+
+    return () => window.clearInterval(interval);
+  }, [officerSummary]);
 
   const showToast = (title, message) => {
     setToast({ title, message });
@@ -1451,7 +1837,7 @@ export default function App() {
       if (rows.some((row) => row.meterId === simulatedQueueCase.meterId)) return rows;
       return [simulatedQueueCase, ...rows];
     });
-    showToast("AI Alert", "Possible theft detected in Zone C — BES-7710");
+    showToast("AI Alert", "Possible theft detected in Zone C  -  BES-7710");
   };
 
   const handleReset = () => {
@@ -1474,6 +1860,10 @@ export default function App() {
     if (status === "Escalated") updateQueueStatus("BES-2048", "Escalated");
   };
 
+  const updateScenario = (key, value) => {
+    setScenario((current) => ({ ...current, [key]: value }));
+  };
+
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <TopNavbar onSimulate={handleSimulate} onReset={handleReset} />
@@ -1483,10 +1873,13 @@ export default function App() {
         <ImpactMetrics simulated={simulated} />
         <DemoStoryTimeline />
         <DemandForecast simulated={simulated} />
+        <KarnatakaDatasetSection rowCount={villageRows.length} summary={villageSummary} curve={villageCurve} />
         <AnomalyAlerts alerts={alerts} />
         <ZoneRiskMap zones={zones} simulated={simulated} />
         <MeterInvestigation status={investigationStatus} onStatus={updateInvestigation} />
+        <AISummarySection summary={officerSummary} promptPreview={promptPreview} visibleCount={visibleSummaryCount} />
         <RevenueImpact simulated={simulated} />
+        <ScenarioSimulatorSection scenario={scenario} onScenarioChange={updateScenario} impact={scenarioImpact} />
         <InspectionQueue rows={queueRows} onDecision={updateQueueStatus} />
         <ExplainabilityAudit />
         <HumanLoopReview />
@@ -1499,3 +1892,4 @@ export default function App() {
     </div>
   );
 }
+
