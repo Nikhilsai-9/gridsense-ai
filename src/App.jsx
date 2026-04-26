@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowRight,
   BadgeCheck,
-  BarChart3,
   Bell,
   Brain,
   Building2,
@@ -15,6 +14,8 @@ import {
   Gauge,
   Github,
   Globe2,
+  Cloud,
+  Clock3,
   IndianRupee,
   Layers3,
   Linkedin,
@@ -360,11 +361,11 @@ function TopNavbar({ onSimulate, onReset }) {
           <div className="hidden items-center gap-2 xl:flex">
             <Badge tone="blue">
               <Database className="h-3.5 w-3.5" />
-              Synthetic Demo Data
+              Bangalore Synthetic Data
             </Badge>
             <Badge tone="green">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              AI Models Online
+              Precomputed AI Demo
             </Badge>
           </div>
           <button type="button" onClick={onSimulate} className="btn-primary" aria-label="Simulate theft detection">
@@ -418,7 +419,7 @@ function HeroVisual({ simulated }) {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-700">AI risk command layer</p>
-            <p className="mt-1 text-sm text-slate-600">Synthetic feeder and smart meter telemetry</p>
+            <p className="mt-1 text-sm text-slate-600">Bengaluru feeder simulation across Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City</p>
           </div>
           <Badge tone={simulated ? "red" : "orange"}>{simulated ? "Live Theft Alert" : "Zone C Watch"}</Badge>
         </div>
@@ -501,14 +502,14 @@ function Hero({ onSimulate, simulated }) {
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
           <Badge tone="blue">
             <Building2 className="h-3.5 w-3.5" />
-            Theme 8 · Smart Meter Intelligence by BESCOM
+            Theme 8 · BESCOM + Bengaluru/Karnataka localized
           </Badge>
           <h1 className="mt-5 text-5xl font-black tracking-normal text-slate-950 md:text-7xl">GridSense AI</h1>
           <p className="mt-5 max-w-3xl text-xl font-semibold leading-8 text-slate-700 md:text-2xl">
-            AI-powered Smart Meter Intelligence & Revenue Recovery System for BESCOM
+            AI-powered Smart Meter Intelligence & Revenue Recovery System for BESCOM officers
           </p>
           <p className="mt-4 text-lg font-black text-blue-700">
-            Detect theft faster. Predict demand earlier. Recover revenue smarter.
+            Bengaluru-ready loss detection with instant demo results, explainable alerts, and inspection priorities.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => scrollToId("dashboard")} className="btn-primary">
@@ -561,7 +562,7 @@ function ImpactMetrics({ simulated }) {
   return (
     <section id="dashboard" className="section-pad bg-white">
       <SectionHeader eyebrow="Impact Metrics" title="Judge-ready problem and impact in one glance">
-        Live synthetic metrics show how GridSense AI turns meter data into operational decisions for loss reduction.
+        Live synthetic Bengaluru-zone metrics show how GridSense AI turns BESCOM smart meter data into operational decisions for loss reduction.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {metrics.map(([label, value, prefix, suffix, Icon, tone, decimals], index) => (
@@ -591,7 +592,7 @@ function DemoStoryTimeline() {
   return (
     <section className="section-pad bg-slate-50">
       <SectionHeader eyebrow="Demo Story" title="How the platform works from data to recovery">
-        A six-step workflow makes the value clear in the first 10 seconds: detect, explain, approve, recover.
+        A six-step workflow makes the value clear in the first 10 seconds: local data, instant AI scoring, explainability, officer action, recovery.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-6">
         {workflowSteps.map(([label, Icon], index) => (
@@ -624,7 +625,7 @@ function DemandForecast({ simulated }) {
   return (
     <section id="forecast" className="section-pad bg-white">
       <SectionHeader eyebrow="Demand Forecasting" title="AI-based peak load prediction">
-        Professional demand intelligence for feeder planning, grid reliability, and evening peak preparation.
+        Professional demand intelligence for Bengaluru feeder planning, evening peak preparation, and localized grid reliability.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1.5fr_0.8fr]">
         <div className="card p-5 md:p-6">
@@ -666,7 +667,7 @@ function DemandForecast({ simulated }) {
               </div>
             </div>
             <p className="mt-5 text-lg font-bold leading-8 text-slate-800">
-              GridSense predicts peak load between 7 PM and 9 PM in Zone B due to residential evening consumption.
+              GridSense predicts peak load between 7 PM and 9 PM in Zone B due to Bengaluru residential evening consumption.
               Recommended action: prepare load balancing and monitor feeder stress.
             </p>
           </div>
@@ -753,7 +754,7 @@ function AnomalyAlerts({ alerts }) {
   return (
     <section id="alerts" className="section-pad bg-slate-50">
       <SectionHeader eyebrow="Anomaly & Theft Detection" title="AI Theft & Anomaly Alerts">
-        Realistic synthetic alerts show what officers need: reason, confidence, estimated loss, and next step.
+        Realistic synthetic BESCOM-style alerts show what officers need: reason, confidence, estimated loss, and next step.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-3">
         {alerts.map((alert, index) => (
@@ -768,7 +769,7 @@ function ZoneRiskMap({ zones, simulated }) {
   return (
     <section id="zones" className="section-pad bg-white">
       <SectionHeader eyebrow="Smart Grid Zone Risk Map" title="Zone-level risk and inspection intelligence">
-        Green zones keep running. Orange zones need planning. Red zones move into theft investigation.
+        Localized Bengaluru zones keep the demo grounded: Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City feeder patterns.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="relative min-h-[500px] overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 p-5 shadow-soft">
@@ -790,7 +791,7 @@ function ZoneRiskMap({ zones, simulated }) {
           <div className="absolute bottom-5 left-5 right-5 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-soft backdrop-blur">
             <h3 className="font-black text-slate-950">Bengaluru zone simulation</h3>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              The map combines load, anomaly severity, and inspection urgency into a command-center view.
+              The map combines local feeder load, anomaly severity, and inspection urgency into a BESCOM command-center view.
             </p>
           </div>
         </div>
@@ -851,7 +852,7 @@ function MeterInvestigation({ status, onStatus }) {
   return (
     <section id="investigation" className="section-pad bg-slate-50">
       <SectionHeader eyebrow="Individual Meter Investigation" title="Evidence package for officer decision">
-        The system explains the alert before field action, keeping the workflow transparent and practical.
+        The system explains the alert before field action, keeping the workflow transparent for BESCOM officer verification.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[0.75fr_1.25fr]">
         <div className="card p-6">
@@ -939,7 +940,7 @@ function RevenueImpact({ simulated }) {
   return (
     <section id="revenue" className="section-pad bg-white">
       <SectionHeader eyebrow="Revenue Impact Engine" title="Converting anomalies into recovery potential">
-        Loss detection becomes useful only when the system ranks where inspection can recover the most revenue.
+        Loss detection becomes useful only when Bengaluru field teams know where inspection can recover the most revenue.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-4">
@@ -1006,7 +1007,7 @@ function InspectionQueue({ rows, onDecision }) {
   return (
     <section id="queue" className="section-pad bg-slate-50">
       <SectionHeader eyebrow="Inspection Priority Queue" title="Practical officer workflow for BESCOM teams">
-        Officers can approve, reject, or escalate cases while the system preserves the decision trail.
+        Officers can approve, reject, or escalate Bengaluru-area cases while the system preserves the decision trail.
       </SectionHeader>
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-command">
         <div className="overflow-x-auto">
@@ -1157,7 +1158,7 @@ function HumanLoopReview() {
   return (
     <section className="section-pad bg-slate-50">
       <SectionHeader eyebrow="Human-In-The-Loop Review" title="AI recommends. BESCOM officers decide.">
-        The workflow is designed for government feasibility, accountability, and safe operational adoption.
+        The workflow is designed for BESCOM feasibility, accountability, and safe operational adoption in Karnataka.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map(([title, Icon, copy]) => (
@@ -1180,6 +1181,34 @@ function HumanLoopReview() {
   );
 }
 
+
+function LocalReadinessSection() {
+  const readiness = [
+    ["Bengaluru localized", "Synthetic feeder zones map to Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City patterns.", Map],
+    ["Vercel-safe demo", "All AI outputs are precomputed in the frontend, so judge clicks return instantly without serverless timeout risk.", Clock3],
+    ["Gemini-ready", "Gemini / Google AI Studio can generate officer-facing case summaries from anomaly evidence in a pilot.", Brain],
+    ["Karnataka scale path", "The same risk scoring flow can extend to additional BESCOM circles and rural Karnataka feeders.", Cloud],
+  ];
+
+  return (
+    <section className="section-pad bg-white">
+      <SectionHeader eyebrow="Judge Feedback Upgrades" title="Localized, reliable, and Google AI-ready">
+        Built to avoid the most common prototype penalties: unclear local relevance, slow cloud functions, and vague AI usage.
+      </SectionHeader>
+      <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {readiness.map(([title, copy, Icon]) => (
+          <div key={title} className="card p-5">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-50 text-orange-700">
+              <Icon className="h-6 w-6" />
+            </span>
+            <h3 className="mt-4 font-black text-slate-950">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 function ComplianceSection() {
   const items = [
     ["Works as a decision-support layer", Layers3],
@@ -1192,7 +1221,7 @@ function ComplianceSection() {
   return (
     <section className="section-pad bg-white">
       <SectionHeader eyebrow="Built for Real-World Deployment" title="Government-ready constraints handled upfront">
-        Submission-ready architecture story: safer integration, masked data, human review, and auditable decisions.
+        Submission-ready architecture story: Bengaluru localization, instant precomputed demo results, masked data, human review, and auditable decisions.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map(([item, Icon]) => (
@@ -1217,10 +1246,10 @@ function PitchModeSection() {
             <p className="eyebrow">Pitch Mode</p>
             <h2 className="mt-3 text-3xl font-black text-slate-950">30-second judge explanation</h2>
             <p className="mt-4 max-w-4xl text-lg font-semibold leading-8 text-slate-700">
-              GridSense AI helps BESCOM detect theft and reduce losses by analyzing smart meter data. It forecasts
-              demand, flags abnormal consumption, estimates revenue loss, explains every alert, and helps officers
-              prioritize inspections. It does not replace existing systems; it works as an intelligent decision-support
-              layer using synthetic or masked data.
+              GridSense AI helps BESCOM detect theft and reduce losses by analyzing Bengaluru smart meter patterns. It
+              forecasts demand, flags abnormal consumption, estimates revenue loss, explains every alert, and helps
+              officers prioritize inspections. The demo is precomputed in the frontend so judges get instant results on
+              Vercel, while Gemini can be used for explainable officer summaries in a production pilot.
             </p>
           </div>
           <button type="button" onClick={() => scrollToId("dashboard")} className="btn-primary shrink-0">
@@ -1249,8 +1278,8 @@ function FinalImpact({ onSimulate }) {
             <p className="text-xs font-black uppercase tracking-[0.24em] text-orange-300">Final Impact</p>
             <h2 className="mt-4 text-4xl font-black tracking-normal md:text-5xl">From Smart Meters to Smart Decisions</h2>
             <p className="mt-5 text-lg font-semibold leading-8 text-slate-200">
-              BESCOM already has valuable smart meter data. GridSense AI turns that data into demand forecasts, theft
-              alerts, inspection priorities, and revenue recovery decisions.
+              BESCOM already has valuable smart meter data across Bengaluru and Karnataka. GridSense AI turns that data
+              into demand forecasts, theft alerts, inspection priorities, and revenue recovery decisions.
             </p>
             <p className="mt-5 rounded-3xl border border-orange-300/30 bg-orange-400/10 p-5 text-xl font-black leading-8 text-white">
               From smart meters to smart decisions — helping utilities detect loss, predict demand, and recover revenue.
@@ -1312,8 +1341,9 @@ function SiteFooter() {
               </div>
             </div>
             <p className="mt-6 max-w-xl text-sm leading-7 text-slate-300">
-              Built for AI for Bharat Hackathon — Theme 8. GridSense AI transforms smart meter data into theft alerts,
-              demand forecasts, inspection priorities, and revenue recovery decisions.
+              Built for AI for Bharat Hackathon — Theme 8. GridSense AI localizes smart meter intelligence for
+              Bengaluru/BESCOM operations, transforming meter data into theft alerts, demand forecasts, inspection
+              priorities, and revenue recovery decisions.
             </p>
           </div>
 
@@ -1363,7 +1393,7 @@ function SiteFooter() {
               <div>
                 <p className="font-black text-white">AI for Bharat Hackathon 2026</p>
                 <p className="mt-1 text-sm font-semibold leading-6 text-orange-100">
-                  Theme 8 — AI for Smart Meter Intelligence & Loss Detection by BESCOM
+                  Theme 8 — AI for Smart Meter Intelligence & Loss Detection by BESCOM, localized for Bengaluru/Karnataka
                 </p>
                 <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-sky-200">
                   Prototype uses synthetic data only.
@@ -1460,6 +1490,7 @@ export default function App() {
         <InspectionQueue rows={queueRows} onDecision={updateQueueStatus} />
         <ExplainabilityAudit />
         <HumanLoopReview />
+        <LocalReadinessSection />
         <ComplianceSection />
         <PitchModeSection />
         <FinalImpact onSimulate={handleSimulate} />
