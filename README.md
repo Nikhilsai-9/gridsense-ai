@@ -32,19 +32,23 @@ The app remains frontend-first and Vercel-safe. All live demo interactions are p
 ## What Is New In This Version
 
 - **Karnataka Data Layer:** Added `public/data/karnataka_village_sample.csv` with irrigation ramps, noon solar support, and evening domestic peaks.
+- **Sample Data Demo Flow:** Added dataset controls, CSV upload support, and an India benchmark sample for judge-friendly exploration.
 - **BESCOM Tariff Engine:** Added slab-based monthly savings calculations in [tariffEngine.js](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/src/lib/tariffEngine.js).
 - **Carbon Impact Panel:** Added CO2 savings using an India grid emission factor model.
 - **Scenario Simulator:** Added slider-based solar, battery, and shiftable-load controls with instant rupee recalculation.
 - **AI Officer Summary:** Added a structured in-browser summary flow that mirrors a production Gemini-style prompt contract.
+- **Vercel Streaming Path:** Added a Vercel-ready SSE endpoint in [api/recommendations.js](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/api/recommendations.js) plus deployment config in [vercel.json](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/vercel.json).
+- **SEO Readiness:** Added canonical metadata, Open Graph tags, `robots.txt`, `sitemap.xml`, and an OG image.
 - **CI + Tests:** Added Vitest coverage for tariff logic and a GitHub Actions workflow.
 
 ## Key Features
 
 - **Bengaluru Localization:** Zones are framed around Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City style feeder patterns.
 - **Karnataka CSV Profile:** The dashboard now references a localized feeder sample rather than generic dashboard-only mock values.
+- **Sample Data Controls:** Judges can load a BESCOM sample, switch to an India benchmark profile, or upload a CSV.
 - **Demand Forecasting:** Predicts peak load windows and feeder stress using hourly demand patterns.
 - **Theft and Anomaly Detection:** Flags sudden drops, irregular spikes, peer-group deviations, and bypass-style risk.
-- **AI Officer Summary:** Uses a structured BESCOM/Gemini-ready prompt contract for explainable case summaries.
+- **AI Officer Summary:** Uses a structured BESCOM/Gemini-ready prompt contract for explainable case summaries, with browser replay and Vercel SSE streaming.
 - **Revenue Impact Engine:** Estimates detected loss, recovery potential, and savings opportunity.
 - **Scenario Lab:** Models monthly outcomes from solar capacity, battery size, and flexible load improvements.
 - **Carbon Signal:** Converts energy savings into CO2 avoided and rough tree-equivalent impact.
@@ -71,6 +75,7 @@ This keeps the live demo fast while showing a clear Google AI integration path.
 - Recharts
 - Framer Motion
 - Lucide React
+- Vercel-ready SSE API route
 - Vitest
 - GitHub Actions
 - Synthetic frontend data + localized CSV sample
@@ -83,9 +88,10 @@ This keeps the live demo fast while showing a clear Google AI integration path.
 4. Click **Simulate Theft**.
 5. Show the new alert, updated queue, and stronger Zone C risk state.
 6. Open the AI officer summary and explain how the case is described in structured operational language.
-7. Move to the **Scenario Simulator** and change solar, battery, or shiftable load.
-8. Show how monthly bill savings and carbon impact update instantly.
-9. End on the human-in-the-loop and deployment-readiness sections.
+7. Click **Stream via Vercel API** to show incremental delivery with a local fallback-safe experience.
+8. Move to the **Scenario Simulator** and change solar, battery, or shiftable load.
+9. Show how monthly bill savings, diesel-versus-solar economics, and carbon impact update instantly.
+10. End on the human-in-the-loop and deployment-readiness sections.
 
 ## How to Run Locally
 
@@ -122,11 +128,14 @@ This project is ready to deploy on Vercel.
 
 The main demo path is frontend-only and precomputed, so it avoids judge-facing timeout risk.
 
+For future hosted AI use, `api/recommendations.js` demonstrates a Vercel-friendly SSE path instead of one blocking response.
+
 ## Verification
 
 - `npm run test` passes
 - `npm run build` passes
 - GitHub Actions workflow added at [.github/workflows/ci.yml](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/.github/workflows/ci.yml)
+- SEO support files added at [index.html](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/index.html), [robots.txt](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/public/robots.txt), and [sitemap.xml](/C:/Users/saini/Documents/Codex/2026-04-24/you-are-a-senior-full-stack-2/public/sitemap.xml)
 
 ## Synthetic Data Disclaimer
 

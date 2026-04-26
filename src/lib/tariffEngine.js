@@ -1,3 +1,5 @@
+import { INDIA_GRID, formatInr } from "./indiaGrid";
+
 export const BESCOM_DEMO_SLABS = [
   { upto: 50, rate: 0 },
   { upto: 100, rate: 3.15 },
@@ -6,8 +8,8 @@ export const BESCOM_DEMO_SLABS = [
   { upto: Number.POSITIVE_INFINITY, rate: 7.45 },
 ];
 
-export const INDIA_GRID_EMISSION_FACTOR = 0.82;
-export const TREE_OFFSET_KG_PER_YEAR = 22;
+export const INDIA_GRID_EMISSION_FACTOR = INDIA_GRID.carbonIntensityKgPerKwh;
+export const TREE_OFFSET_KG_PER_YEAR = INDIA_GRID.treeOffsetKgPerYear;
 
 export function calculateTariffBreakdown(units, slabs = BESCOM_DEMO_SLABS) {
   let remaining = Math.max(0, Number(units) || 0);
@@ -81,5 +83,5 @@ export function estimateScenarioImpact({
 }
 
 export function formatRupees(value) {
-  return `Rs ${Math.round(value).toLocaleString("en-IN")}`;
+  return formatInr(value);
 }

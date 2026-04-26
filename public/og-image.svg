@@ -1,0 +1,19 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#071A3D"/>
+  <rect x="48" y="48" width="1104" height="534" rx="32" fill="url(#bg)"/>
+  <circle cx="890" cy="204" r="118" fill="#2563EB" fill-opacity="0.24"/>
+  <circle cx="938" cy="426" r="136" fill="#F97316" fill-opacity="0.18"/>
+  <path d="M165 365L290 250L420 315L535 210L690 270" stroke="#7DD3FC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M206 174H312V256H206V174Z" fill="#F8FAFC" fill-opacity="0.12"/>
+  <path d="M284 138L238 223H282L251 302L344 194H292L322 138H284Z" fill="#FB923C"/>
+  <text x="148" y="184" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">BESCOM Smart Meter Intelligence</text>
+  <text x="148" y="254" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="78" font-weight="800">GridSense AI</text>
+  <text x="148" y="326" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="600">Demand forecasting, theft detection, inspection priority, and revenue recovery.</text>
+  <text x="148" y="430" fill="#E2E8F0" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">Localized for Bengaluru and Karnataka • Synthetic data • Human-in-the-loop</text>
+  <defs>
+    <linearGradient id="bg" x1="48" y1="48" x2="1152" y2="582" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B2A5B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -96,6 +96,7 @@ const slides = [
       ["Karnataka Data Layer", "CSV-backed feeder profile with irrigation, solar, and evening domestic load patterns."],
       ["Bengaluru Zone Map", "Peenya, Whitefield, KR Puram, Yelahanka, and Electronic City style zones."],
       ["Tariff + Carbon Engine", "Monthly savings and CO2 impact from BESCOM-style optimization scenarios."],
+      ["Sample Data Controls", "Load BESCOM sample, switch to India benchmark, or upload CSV for demo flexibility."],
       ["Inspection Queue", "Approve, reject, or escalate Bengaluru-area cases."],
       ["Explainability", "Reason, formula, audit timeline, and officer summary prompt contract."],
     ],
@@ -119,9 +120,9 @@ const slides = [
     type: "architecture",
     layers: [
       ["Data Layer", "Synthetic meter readings, Karnataka CSV load sample, zone load, peer groups"],
-      ["AI Layer", "Precomputed forecasting, anomaly scoring, Gemini-ready explanation summaries"],
+      ["AI Layer", "Precomputed forecasting, anomaly scoring, Gemini-ready explanation summaries, Vercel SSE path"],
       ["App Layer", "React dashboard, tariff engine, scenario simulator, officer workflow"],
-      ["Cloud Layer", "Vercel static prototype now; Firebase/GCP-ready storage for pilot"],
+      ["Cloud Layer", "Vercel static prototype now; SEO files, sitemap, robots, Firebase/GCP-ready pilot path"],
     ],
   },
   {
@@ -136,6 +137,7 @@ const slides = [
       "Framer Motion",
       "Lucide Icons",
       "Vitest + GitHub Actions",
+      "Vercel SSE endpoint",
       "Gemini API / Google AI Studio ready",
       "Firebase / Google Cloud ready",
       "Synthetic Bengaluru smart meter data + Karnataka CSV sample",

@@ -8,11 +8,11 @@ Theme 8 - AI for Smart Meter Intelligence & Loss Detection by BESCOM
 
 GridSense AI is an AI-powered smart meter intelligence and revenue recovery platform designed for BESCOM and localized for Bengaluru/Karnataka electricity distribution scenarios. It converts smart meter signals into practical officer workflows: demand forecasting, theft-risk identification, explainable alerts, inspection prioritization, and revenue impact estimation.
 
-The latest prototype adds stronger local grounding through a Karnataka feeder sample CSV, BESCOM-style slab tariff calculations, carbon impact estimation, and a browser-native scenario simulator. These additions make the demo more regionally relevant and more useful as a decision-support tool rather than only a visual dashboard.
+The latest prototype adds stronger local grounding through a Karnataka feeder sample CSV, an India benchmark sample dataset, BESCOM-style slab tariff calculations, carbon impact estimation, SEO-ready deployment files, and a browser-native scenario simulator. These additions make the demo more regionally relevant and more useful as a decision-support tool rather than only a visual dashboard.
 
 The platform works as a decision-support layer without modifying existing BESCOM systems. It uses synthetic and masked prototype data to demonstrate hourly demand forecasting, anomaly detection, zone-level risk scoring, estimated revenue loss, officer-facing AI summaries, and a human review workflow.
 
-The live demo is intentionally reliable for judging. AI analysis is simulated in the frontend and streamed directly in the browser, so interactions remain instant on Vercel without dependence on slow serverless inference. A production version can connect the structured prompt contract to Gemini / Google AI Studio for secure officer-facing explanations.
+The live demo is intentionally reliable for judging. AI analysis is simulated in the frontend and streamed directly in the browser, while a Vercel-ready SSE endpoint is also included for incremental server delivery instead of one blocking response. A production version can connect the structured prompt contract to Gemini / Google AI Studio for secure officer-facing explanations.
 
 Key features include:
 
@@ -20,6 +20,7 @@ Key features include:
 - theft and anomaly detection
 - Bengaluru zone-level risk map
 - Karnataka feeder data context
+- sample-data controls and CSV upload path
 - BESCOM-style tariff savings engine
 - carbon impact estimation
 - inspection priority queue

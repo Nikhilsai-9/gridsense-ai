@@ -57,12 +57,21 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { calculateIndiaCostSnapshot, formatInr, INDIA_GRID, INDIA_PROGRAMS } from "./lib/indiaGrid";
 import { buildLoadCurve, parseCsvRows, summarizeVillageData } from "./lib/karnatakaData";
 import { buildOfficerSummaryPrompt, createMockOfficerSummary } from "./lib/prompts";
 import { estimateScenarioImpact, formatRupees } from "./lib/tariffEngine";
 
 const rupee = new Intl.NumberFormat("en-IN");
 const currency = "\u20B9";
+const BESCOM_SAMPLE_DATASET = {
+  path: "/data/karnataka_village_sample.csv",
+  label: "BESCOM Karnataka sample",
+};
+const INDIA_BENCHMARK_DATASET = {
+  path: "/data/sample-india-grid.csv",
+  label: "India benchmark sample",
+};
 const defaultVillageSummary = {
   baseMonthlyUnits: 1860,
   peakHour: "7 PM",
@@ -287,6 +296,17 @@ function cn(...classes) {
 
 function scrollToId(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function buildSummaryLines(summary) {
+  return [
+    summary.headline,
+    `Inspection priority: ${summary.inspectionPriority}`,
+    `Estimated loss impact: ${currency}${rupee.format(summary.estimatedLossInr)}`,
+    `Carbon-linked efficiency opportunity: ${summary.carbonImpactKg.toFixed(0)} kg CO2`,
+    ...summary.rationale,
+    summary.officerNote,
+  ];
 }
 
 function AnimatedNumber({ value, prefix = "", suffix = "", decimals = 0 }) {
@@ -708,7 +728,15 @@ function DemandForecast({ simulated }) {
   );
 }
 
-function KarnatakaDatasetSection({ rowCount, summary, curve }) {
+function KarnatakaDatasetSection({
+  rowCount,
+  summary,
+  curve,
+  activeDatasetLabel,
+  onLoadBESCOMSample,
+  onLoadIndiaSample,
+  onUploadCsv,
+}) {
   const insightCards = [
     ["Community sample", rowCount ? `${rowCount} hourly rows loaded` : "Fallback profile active", Database, "blue"],
     ["Morning pump peak", `${summary.peakHour} peak at ${summary.peakLoad} kWh`, Gauge, "orange"],
@@ -728,7 +756,24 @@ function KarnatakaDatasetSection({ rowCount, summary, curve }) {
               <h3 className="text-xl font-black text-slate-950">Karnataka village sample curve</h3>
               <p className="mt-1 text-sm text-slate-500">Net feeder load compared with solar support from the CSV profile</p>
             </div>
-            <Badge tone="blue">/public/data/karnataka_village_sample.csv</Badge>
+            <div className="flex flex-wrap gap-2">
+              <Badge tone="blue">{activeDatasetLabel}</Badge>
+              <Badge tone="green">{rowCount} rows</Badge>
+            </div>
+          </div>
+          <div className="mb-5 flex flex-wrap gap-2">
+            <button type="button" onClick={onLoadBESCOMSample} className="btn-ghost">
+              <Database className="h-4 w-4" />
+              Load BESCOM Sample
+            </button>
+            <button type="button" onClick={onLoadIndiaSample} className="btn-ghost">
+              <RefreshCcw className="h-4 w-4" />
+              Load India Benchmark
+            </button>
+            <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+              <span>Upload CSV</span>
+              <input type="file" accept=".csv,text/csv" className="hidden" onChange={onUploadCsv} />
+            </label>
           </div>
           <div className="h-[340px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -771,20 +816,19 @@ function KarnatakaDatasetSection({ rowCount, summary, curve }) {
   );
 }
 
-function AISummarySection({ summary, promptPreview, visibleCount }) {
-  const streamLines = [
-    summary.headline,
-    `Inspection priority: ${summary.inspectionPriority}`,
-    `Estimated loss impact: ${currency}${rupee.format(summary.estimatedLossInr)}`,
-    `Carbon-linked efficiency opportunity: ${summary.carbonImpactKg.toFixed(0)} kg CO2`,
-    ...summary.rationale,
-    summary.officerNote,
-  ];
-
+function AISummarySection({
+  summary,
+  promptPreview,
+  streamedLines,
+  streamSource,
+  isStreaming,
+  onApiStream,
+  onReplayLocal,
+}) {
   return (
     <section id="analysis" className="section-pad bg-white">
       <SectionHeader eyebrow="AI Officer Summary" title="Fast, judge-safe analysis without backend timeout">
-        Instead of waiting on a slow hosted model, the prototype streams a structured officer note in-browser. The same prompt contract can later be connected to Gemini or any secure utility LLM endpoint.
+        Instead of waiting on a slow hosted model, the prototype can replay a local browser stream or use a Vercel SSE endpoint. The same prompt contract can later be connected to Gemini or any secure utility LLM endpoint.
       </SectionHeader>
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <div className="card p-6">
@@ -807,11 +851,24 @@ function AISummarySection({ summary, promptPreview, visibleCount }) {
               <h3 className="text-xl font-black text-slate-950">Officer-facing streamed note</h3>
               <p className="mt-1 text-sm text-slate-500">Structured summary for queue review and field planning</p>
             </div>
-            <Badge tone={summary.riskLevel === "Critical" ? "red" : "orange"}>{summary.riskLevel}</Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="blue">{streamSource}</Badge>
+              <Badge tone={summary.riskLevel === "Critical" ? "red" : "orange"}>{summary.riskLevel}</Badge>
+            </div>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button type="button" onClick={onApiStream} className="btn-primary">
+              <Brain className="h-4 w-4" />
+              Stream via Vercel API
+            </button>
+            <button type="button" onClick={onReplayLocal} className="btn-ghost">
+              <RefreshCcw className="h-4 w-4" />
+              Replay Local Stream
+            </button>
           </div>
           <div className="mt-5 rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
             <div className="space-y-3">
-              {streamLines.slice(0, visibleCount).map((line, index) => (
+              {streamedLines.map((line, index) => (
                 <motion.div
                   key={`${index}-${line}`}
                   initial={{ opacity: 0, x: -10 }}
@@ -821,6 +878,12 @@ function AISummarySection({ summary, promptPreview, visibleCount }) {
                   {line}
                 </motion.div>
               ))}
+              {isStreaming ? (
+                <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-xs font-black text-blue-700">
+                  <span className="h-2 w-2 rounded-full bg-blue-500" />
+                  Streaming response...
+                </div>
+              ) : null}
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {summary.policyContext.map((item) => (
@@ -859,7 +922,52 @@ function ScenarioSlider({ label, value, min, max, step, suffix = "", onChange })
   );
 }
 
-function ScenarioSimulatorSection({ scenario, onScenarioChange, impact }) {
+function IndiaCostPanel({ snapshot }) {
+  const paybackCopy =
+    snapshot.paybackMonths < 36
+      ? "Excellent ROI for a subsidy-backed pilot."
+      : snapshot.paybackMonths < 60
+        ? "Good ROI and suitable for MNRE-style rural support."
+        : "Use PM-KUSUM or feeder modernization support to strengthen economics.";
+
+  return (
+    <div className="card p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-xl font-black text-slate-950">India cost and carbon panel</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Diesel Rs {INDIA_GRID.dieselCostInrPerKwh}/kWh equivalent | Solar Rs {INDIA_GRID.solarCostInrPerKwh}/kWh equivalent | Grid carbon {INDIA_GRID.carbonIntensityKgPerKwh} kg CO2/kWh
+          </p>
+        </div>
+        <Badge tone="orange">{INDIA_PROGRAMS.mnreWindow}</Badge>
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ImpactTile label="Diesel equivalent" value={formatInr(snapshot.dieselCostMonthly)} icon={IndianRupee} tone="red" />
+        <ImpactTile label="Solar equivalent" value={formatInr(snapshot.solarCostMonthly)} icon={SunMedium} tone="green" />
+        <ImpactTile label="Annual saving" value={formatInr(snapshot.annualSavingsInr)} icon={Target} tone="orange" />
+        <ImpactTile label="Payback" value={`${snapshot.paybackYears.toFixed(1)} yrs`} icon={BatteryCharging} tone="blue" />
+      </div>
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-700">Carbon impact</p>
+          <p className="mt-3 text-3xl font-black text-emerald-700">{snapshot.co2AvoidedKgPerMonth.toFixed(0)} kg</p>
+          <p className="mt-2 text-sm font-semibold leading-7 text-slate-700">
+            Avoided per month, or roughly {snapshot.treeEquivalent} tree-equivalent offsets across a year.
+          </p>
+        </div>
+        <div className="rounded-3xl border border-orange-200 bg-orange-50 p-5">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">Policy note</p>
+          <p className="mt-3 text-base font-semibold leading-7 text-slate-700">{paybackCopy}</p>
+          <p className="mt-3 text-sm font-semibold text-slate-600">
+            Programs referenced: {INDIA_PROGRAMS.programs.join(", ")}.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ScenarioSimulatorSection({ scenario, onScenarioChange, impact, costSnapshot }) {
   const chartData = [
     { label: "Baseline units", value: Math.round(impact.baselineUnits), fill: "#0f172a" },
     { label: "Solar offset", value: Math.round(impact.solarOffsetUnits), fill: "#2563eb" },
@@ -967,6 +1075,7 @@ function ScenarioSimulatorSection({ scenario, onScenarioChange, impact }) {
               </div>
             </div>
           </div>
+          <IndiaCostPanel snapshot={costSnapshot} />
         </div>
       </div>
     </section>
@@ -1706,12 +1815,15 @@ export default function App() {
   const [queueRows, setQueueRows] = useState(baseQueue);
   const [investigationStatus, setInvestigationStatus] = useState("High Risk");
   const [villageRows, setVillageRows] = useState([]);
+  const [activeDatasetLabel, setActiveDatasetLabel] = useState(BESCOM_SAMPLE_DATASET.label);
   const [scenario, setScenario] = useState({
     solarKw: 24,
     batteryKwh: 35,
     shiftableLoadPct: 18,
   });
-  const [visibleSummaryCount, setVisibleSummaryCount] = useState(0);
+  const [summaryLines, setSummaryLines] = useState([]);
+  const [summarySource, setSummarySource] = useState("Browser stream");
+  const [summaryStreaming, setSummaryStreaming] = useState(false);
   const [toast, setToast] = useState(null);
 
   const alerts = useMemo(() => (simulated ? [simulatedAlert, ...baseAlerts] : baseAlerts), [simulated]);
@@ -1743,6 +1855,10 @@ export default function App() {
         shiftableLoadPct: scenario.shiftableLoadPct,
       }),
     [scenario, villageSummary.baseMonthlyUnits],
+  );
+  const indiaCostSnapshot = useMemo(
+    () => calculateIndiaCostSnapshot(Math.max(scenarioImpact.optimizedUnits, villageSummary.baseMonthlyUnits * 0.58)),
+    [scenarioImpact.optimizedUnits, villageSummary.baseMonthlyUnits],
   );
 
   const zones = useMemo(
@@ -1789,47 +1905,68 @@ export default function App() {
       }),
     [scenarioImpact.carbonSavedKg, scenarioImpact.rupeeSavings, simulated, villageSummary.summaryText],
   );
-
-  useEffect(() => {
-    let active = true;
-
-    fetch("/data/karnataka_village_sample.csv")
-      .then((response) => response.text())
-      .then((csvText) => {
-        if (!active) return;
-        setVillageRows(parseCsvRows(csvText));
-      })
-      .catch(() => {
-        if (!active) return;
-        setVillageRows([]);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const streamLength = 6 + officerSummary.rationale.length;
-    setVisibleSummaryCount(1);
-    const interval = window.setInterval(() => {
-      setVisibleSummaryCount((current) => {
-        if (current >= streamLength) {
-          window.clearInterval(interval);
-          return current;
-        }
-        return current + 1;
-      });
-    }, 220);
-
-    return () => window.clearInterval(interval);
-  }, [officerSummary]);
+  const localSummaryLines = useMemo(() => buildSummaryLines(officerSummary), [officerSummary]);
 
   const showToast = (title, message) => {
     setToast({ title, message });
     window.clearTimeout(window.__gridSenseToast);
     window.__gridSenseToast = window.setTimeout(() => setToast(null), 3600);
   };
+
+  const playLocalSummary = (source = "Browser stream", lines = localSummaryLines) => {
+    window.clearInterval(window.__gridSenseSummaryInterval);
+    setSummarySource(source);
+    setSummaryStreaming(true);
+    if (!lines.length) {
+      setSummaryLines([]);
+      setSummaryStreaming(false);
+      return;
+    }
+    setSummaryLines([lines[0]]);
+    let index = 1;
+    window.__gridSenseSummaryInterval = window.setInterval(() => {
+      if (index >= lines.length) {
+        window.clearInterval(window.__gridSenseSummaryInterval);
+        setSummaryStreaming(false);
+        return;
+      }
+      const nextLine = lines[index];
+      index += 1;
+      setSummaryLines((current) => [...current, nextLine]);
+    }, 220);
+  };
+
+  const loadDataset = async (dataset, silent = false) => {
+    const response = await fetch(dataset.path);
+    if (!response.ok) {
+      throw new Error(`Failed to load ${dataset.label}`);
+    }
+    const csvText = await response.text();
+    const parsed = parseCsvRows(csvText);
+    setVillageRows(parsed);
+    setActiveDatasetLabel(dataset.label);
+    if (!silent) {
+      showToast("Sample Data Loaded", `${dataset.label} is now active in the dashboard`);
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+    loadDataset(BESCOM_SAMPLE_DATASET, true).catch(() => {
+      if (!active) return;
+      setVillageRows([]);
+      setActiveDatasetLabel("Fallback profile");
+    });
+
+    return () => {
+      active = false;
+      window.clearInterval(window.__gridSenseSummaryInterval);
+    };
+  }, []);
+
+  useEffect(() => {
+    playLocalSummary("Browser stream", localSummaryLines);
+  }, [localSummaryLines]);
 
   const handleSimulate = () => {
     setSimulated(true);
@@ -1844,6 +1981,10 @@ export default function App() {
     setSimulated(false);
     setQueueRows(baseQueue);
     setInvestigationStatus("High Risk");
+    loadDataset(BESCOM_SAMPLE_DATASET, true).catch(() => {
+      setVillageRows([]);
+      setActiveDatasetLabel("Fallback profile");
+    });
     showToast("Demo Reset", "GridSense AI synthetic dashboard restored to baseline");
   };
 
@@ -1864,6 +2005,80 @@ export default function App() {
     setScenario((current) => ({ ...current, [key]: value }));
   };
 
+  const handleUploadCsv = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const csvText = await file.text();
+      const parsed = parseCsvRows(csvText);
+      setVillageRows(parsed);
+      setActiveDatasetLabel(`Uploaded CSV: ${file.name}`);
+      showToast("CSV Uploaded", `${file.name} is now driving the localized data section`);
+    } catch {
+      showToast("Upload Failed", "The CSV could not be parsed. Please try a valid UTF-8 CSV file.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const handleApiStream = async () => {
+    window.clearInterval(window.__gridSenseSummaryInterval);
+    setSummarySource("Vercel SSE stream");
+    setSummaryStreaming(true);
+    setSummaryLines([]);
+
+    try {
+      const response = await fetch("/api/recommendations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          summaryLines: localSummaryLines,
+          delayMs: 160,
+          metadata: {
+            meterId: "BES-2048",
+            zone: "Zone C",
+            dataset: activeDatasetLabel,
+          },
+        }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error("Streaming endpoint unavailable");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const chunks = buffer.split("\n\n");
+        buffer = chunks.pop() ?? "";
+
+        for (const chunk of chunks) {
+          if (!chunk.startsWith("data:")) continue;
+          const payload = JSON.parse(chunk.slice(5).trim());
+          if (payload.error) throw new Error(payload.error);
+          if (payload.done) {
+            setSummaryStreaming(false);
+            continue;
+          }
+          if (payload.text) {
+            setSummaryLines((current) => [...current, payload.text]);
+          }
+        }
+      }
+
+      setSummaryStreaming(false);
+      showToast("API Stream Complete", "Structured officer note streamed successfully from the Vercel-ready endpoint");
+    } catch {
+      showToast("API Stream Fallback", "Endpoint not available locally, replaying the browser stream instead");
+      playLocalSummary("Browser fallback", localSummaryLines);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <TopNavbar onSimulate={handleSimulate} onReset={handleReset} />
@@ -1873,13 +2088,34 @@ export default function App() {
         <ImpactMetrics simulated={simulated} />
         <DemoStoryTimeline />
         <DemandForecast simulated={simulated} />
-        <KarnatakaDatasetSection rowCount={villageRows.length} summary={villageSummary} curve={villageCurve} />
+        <KarnatakaDatasetSection
+          rowCount={villageRows.length}
+          summary={villageSummary}
+          curve={villageCurve}
+          activeDatasetLabel={activeDatasetLabel}
+          onLoadBESCOMSample={() => loadDataset(BESCOM_SAMPLE_DATASET)}
+          onLoadIndiaSample={() => loadDataset(INDIA_BENCHMARK_DATASET)}
+          onUploadCsv={handleUploadCsv}
+        />
         <AnomalyAlerts alerts={alerts} />
         <ZoneRiskMap zones={zones} simulated={simulated} />
         <MeterInvestigation status={investigationStatus} onStatus={updateInvestigation} />
-        <AISummarySection summary={officerSummary} promptPreview={promptPreview} visibleCount={visibleSummaryCount} />
+        <AISummarySection
+          summary={officerSummary}
+          promptPreview={promptPreview}
+          streamedLines={summaryLines}
+          streamSource={summarySource}
+          isStreaming={summaryStreaming}
+          onApiStream={handleApiStream}
+          onReplayLocal={() => playLocalSummary("Browser stream", localSummaryLines)}
+        />
         <RevenueImpact simulated={simulated} />
-        <ScenarioSimulatorSection scenario={scenario} onScenarioChange={updateScenario} impact={scenarioImpact} />
+        <ScenarioSimulatorSection
+          scenario={scenario}
+          onScenarioChange={updateScenario}
+          impact={scenarioImpact}
+          costSnapshot={indiaCostSnapshot}
+        />
         <InspectionQueue rows={queueRows} onDecision={updateQueueStatus} />
         <ExplainabilityAudit />
         <HumanLoopReview />
