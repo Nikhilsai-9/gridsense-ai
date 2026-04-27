@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GridSense AI Demo</title>
+    <meta
+      name="description"
+      content="Simple live demo page for GridSense AI - Smart Meter Intelligence & Revenue Recovery System for BESCOM."
+    />
+    <style>
+      :root {
+        --navy: #0b1f4d;
+        --navy-soft: #1f3b7a;
+        --blue: #2f6df6;
+        --orange: #f28c28;
+        --green: #118c4f;
+        --red: #d44747;
+        --slate: #e9eef9;
+        --text: #11203d;
+        --muted: #5b6986;
+        --white: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(180deg, #f7f9ff 0%, #eef4ff 100%);
+        color: var(--text);
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 18px 60px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
+        color: var(--white);
+        border-radius: 28px;
+        padding: 36px 28px;
+        box-shadow: 0 24px 60px rgba(11, 31, 77, 0.18);
+      }
+
+      .hero h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 760px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 16px 0 24px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      button,
+      .link-btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+
+      button:hover,
+      .link-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary {
+        background: var(--orange);
+        color: #171717;
+      }
+
+      .secondary {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .section {
+        margin-top: 28px;
+        background: var(--white);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 16px 42px rgba(17, 32, 61, 0.08);
+      }
+
+      .section h2 {
+        margin: 0 0 12px;
+        font-size: 1.5rem;
+      }
+
+      .section p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .demo-box,
+      .simple-card {
+        border-radius: 20px;
+        border: 1px solid #dde6fb;
+        background: #f9fbff;
+        padding: 18px;
+      }
+
+      .simple-card strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .step-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .step {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border-radius: 16px;
+        background: var(--white);
+        border: 1px solid #e2e8f7;
+        padding: 14px;
+      }
+
+      .step-number {
+        flex: 0 0 auto;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--white);
+        background: var(--blue);
+      }
+
+      .live-panel {
+        min-height: 340px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .status-line {
+        border-radius: 14px;
+        padding: 14px;
+        background: var(--white);
+        border: 1px solid #e1e8fa;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .status-line.active {
+        border-color: #ffd7ab;
+        background: #fff7ef;
+      }
+
+      .status-line.good {
+        border-color: #cbeedb;
+        background: #f2fff7;
+      }
+
+      .status-line.alert {
+        border-color: #ffcaca;
+        background: #fff4f4;
+      }
+
+      .features {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: var(--text);
+        line-height: 1.9;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .quote {
+        margin-top: 18px;
+        border-left: 4px solid var(--orange);
+        padding: 12px 14px;
+        background: #fff7ef;
+        border-radius: 0 16px 16px 0;
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .script-box {
+        margin-top: 18px;
+        border-radius: 18px;
+        background: #0e224f;
+        color: #f8fbff;
+        padding: 18px;
+      }
+
+      .script-box p {
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      .footer-note {
+        margin-top: 22px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 860px) {
+        .demo-grid,
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <div class="badge-row">
+          <span class="badge">Theme 8</span>
+          <span class="badge">BESCOM Demo</span>
+          <span class="badge">Simple Live Presentation</span>
+        </div>
+        <h1>GridSense AI</h1>
+        <p>
+          This is a simple demo of our project. It shows how smart meter data can help BESCOM find
+          theft, predict demand, and recover revenue in a simple and clear way.
+        </p>
+        <div class="hero-actions">
+          <button class="primary" id="playDemo">Play Demo</button>
+          <a class="link-btn secondary" href="./">Open Full Prototype</a>
+        </div>
+      </section>
+
+      <section class="section" id="live-demo">
+        <h2>Live Demo</h2>
+        <p>
+          This part shows the main idea of our prototype. The demo is simple. First, the system
+          checks meter data. Then it finds a risky meter. After that, it shows the reason and the
+          next action.
+        </p>
+
+        <div class="demo-grid">
+          <div class="demo-box">
+            <div class="step-list">
+              <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                  <strong>Read meter data</strong>
+                  The system gets power usage from smart meters.
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                  <strong>Find a problem</strong>
+                  If the pattern looks strange, the system marks it.
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                  <strong>Give a clear result</strong>
+                  The officer sees the risk, loss, and suggested action.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-box live-panel">
+            <div class="status-line active" id="demoStatus">
+              Waiting to start demo...
+            </div>
+            <div class="status-line" id="demoLine1">Meter data is ready.</div>
+            <div class="status-line" id="demoLine2">No risk checked yet.</div>
+            <div class="status-line" id="demoLine3">Revenue loss not shown yet.</div>
+            <div class="status-line" id="demoLine4">Officer action not generated yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="real-life">
+        <h2>How It Works in Real Life</h2>
+        <p>
+          In real life, BESCOM already has smart meter data. Our project uses that data to find
+          unusual power usage. If one meter suddenly drops or behaves very differently, the system
+          shows an alert. Then the officer can check the case and decide the next step.
+        </p>
+      </section>
+
+      <section class="section" id="features">
+        <h2>Key Features</h2>
+        <div class="feature-grid">
+          <div class="simple-card">
+            <strong>Demand Forecast</strong>
+            It shows when power usage may go high.
+          </div>
+          <div class="simple-card">
+            <strong>Theft Detection</strong>
+            It finds unusual meter behavior quickly.
+          </div>
+          <div class="simple-card">
+            <strong>Revenue Loss View</strong>
+            It shows how much money may be lost.
+          </div>
+          <div class="simple-card">
+            <strong>Officer Review</strong>
+            It helps officers decide what to do next.
+          </div>
+        </div>
+        <ul class="features">
+          <li>Simple live alert simulation</li>
+          <li>Zone level risk view</li>
+          <li>Short explanation for each alert</li>
+          <li>Human review before final action</li>
+          <li>Easy to show in a hackathon demo</li>
+        </ul>
+      </section>
+
+      <section class="section" id="conclusion">
+        <h2>Why This Solution Is Useful</h2>
+        <p>
+          This solution is useful because it helps the electricity board act faster. It saves time,
+          helps reduce power theft, and supports better decisions. It does not replace officers. It
+          simply helps them work in a smarter way.
+        </p>
+        <div class="quote">
+          This is a simple demo of our project. It shows how the system works in real time. The
+          user can easily understand the feedback and use it for safe recovery.
+        </div>
+      </section>
+
+      <section class="section" id="submission">
+        <h2>Short Submission Description</h2>
+        <p id="submitText">
+          GridSense AI is a simple smart meter intelligence system for BESCOM. It helps detect
+          unusual usage, predict demand, show possible revenue loss, and support officer decisions
+          in a clear and practical way.
+        </p>
+
+        <div class="script-box">
+          <h2 style="margin-top: 0;">Simple Video Demo Script</h2>
+          <p>
+            Hello, this is our project GridSense AI. Our idea is to help BESCOM understand smart
+            meter data in a simple way. In this demo, the system reads meter data, finds a risky
+            pattern, shows the possible revenue loss, and gives the next action for the officer.
+            This is useful because it can help reduce theft, improve monitoring, and support faster
+            field decisions.
+          </p>
+        </div>
+
+        <p class="footer-note">
+          This page is made only for demo presentation and submission. The full working prototype
+          is also available.
+        </p>
+      </section>
+    </div>
+
+    <script>
+      const status = document.getElementById("demoStatus");
+      const line1 = document.getElementById("demoLine1");
+      const line2 = document.getElementById("demoLine2");
+      const line3 = document.getElementById("demoLine3");
+      const line4 = document.getElementById("demoLine4");
+      const playButton = document.getElementById("playDemo");
+
+      const resetDemo = () => {
+        status.textContent = "Waiting to start demo...";
+        status.className = "status-line active";
+        line1.textContent = "Meter data is ready.";
+        line1.className = "status-line";
+        line2.textContent = "No risk checked yet.";
+        line2.className = "status-line";
+        line3.textContent = "Revenue loss not shown yet.";
+        line3.className = "status-line";
+        line4.textContent = "Officer action not generated yet.";
+        line4.className = "status-line";
+      };
+
+      playButton.addEventListener("click", () => {
+        resetDemo();
+        status.textContent = "Demo started. Reading smart meter data...";
+
+        setTimeout(() => {
+          line1.textContent = "Zone C meter shows a sudden drop in power usage.";
+          line1.className = "status-line alert";
+        }, 700);
+
+        setTimeout(() => {
+          line2.textContent = "System marks it as high risk with 94% confidence.";
+          line2.className = "status-line alert";
+        }, 1500);
+
+        setTimeout(() => {
+          line3.textContent = "Estimated revenue loss: Rs 18,500";
+          line3.className = "status-line good";
+        }, 2300);
+
+        setTimeout(() => {
+          line4.textContent = "Suggested action: send for field inspection in 24 hours.";
+          line4.className = "status-line good";
+          status.textContent = "Demo complete. This is how the prototype helps in a real case.";
+          status.className = "status-line good";
+        }, 3100);
+      });
+
+      if (new URLSearchParams(window.location.search).get("autoplay") === "1") {
+        window.addEventListener("load", () => {
+          setTimeout(() => playButton.click(), 300);
+        });
+      }
+
+      const sectionId = new URLSearchParams(window.location.search).get("section");
+      if (sectionId) {
+        window.addEventListener("load", () => {
+          setTimeout(() => {
+            document.getElementById(sectionId)?.scrollIntoView({ behavior: "instant", block: "start" });
+          }, 150);
+        });
+      }
+    </script>
+  </body>
+</html>
