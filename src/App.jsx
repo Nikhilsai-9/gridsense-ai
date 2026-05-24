@@ -8,11 +8,16 @@ import {
   Building2,
   CheckCircle2,
   ClipboardCheck,
+  Database,
   FileCheck2,
   Gauge,
+  Github,
+  Globe2,
   IndianRupee,
   Info,
+  Linkedin,
   LineChart as LineChartIcon,
+  Mail,
   MapPinned,
   RefreshCcw,
   SearchCheck,
@@ -209,6 +214,15 @@ const steps = [
   ["explain", "7", "AI Explanation"],
 ];
 
+const projectLinks = [
+  ["GitHub", "https://github.com/Nikhilsai-9", Github],
+  ["LinkedIn", "https://www.linkedin.com/in/nikhilsai-kenguri-0b0976322", Linkedin],
+  ["Portfolio", "https://nikhilsai-9.github.io/nikhilsai-portfolio/", Globe2],
+  ["Email", "mailto:sainikhil1146@gmail.com", Mail],
+];
+
+const techStack = ["React", "Tailwind CSS", "Recharts", "Lucide Icons", "Synthetic Data", "Vercel"];
+
 function scrollToId(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -244,14 +258,6 @@ function Header({ onSimulate, onReset }) {
           </span>
         </button>
 
-        <nav className="nav-links" aria-label="Dashboard sections">
-          {steps.map(([id, number, label]) => (
-            <button key={id} type="button" onClick={() => scrollToId(id)}>
-              {number}. {label}
-            </button>
-          ))}
-        </nav>
-
         <div className="nav-actions">
           <button type="button" className="primary-btn" onClick={onSimulate}>
             <Siren size={16} />
@@ -264,6 +270,71 @@ function Header({ onSimulate, onReset }) {
         </div>
       </div>
     </header>
+  );
+}
+
+function Sidebar({ onSimulate }) {
+  return (
+    <aside className="left-sidebar" aria-label="Dashboard information and navigation">
+      <div className="sidebar-card">
+        <p className="sidebar-kicker">Dashboard Flow</p>
+        <nav className="sidebar-nav" aria-label="Dashboard steps">
+          {steps.map(([id, number, label]) => (
+            <button key={id} type="button" onClick={() => scrollToId(id)}>
+              <span>{number}</span>
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="sidebar-card project-card">
+        <div className="project-mark">
+          <Zap size={22} />
+        </div>
+        <h3>GridSense AI</h3>
+        <p>Smart Meter Intelligence and Revenue Recovery System for BESCOM.</p>
+        <button type="button" className="primary-btn sidebar-demo-btn" onClick={onSimulate}>
+          <Siren size={16} />
+          Simulate Theft
+        </button>
+      </div>
+
+      <div className="sidebar-card">
+        <p className="sidebar-kicker">Hackathon Info</p>
+        <div className="sidebar-info-list">
+          <span><strong>AI for Bharat Hackathon 2026</strong></span>
+          <span>Theme 8: Smart Meter Intelligence and Loss Detection by BESCOM</span>
+          <span>Prototype uses synthetic data only.</span>
+        </div>
+      </div>
+
+      <div className="sidebar-card">
+        <p className="sidebar-kicker">Built With</p>
+        <div className="stack-list">
+          {techStack.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="sidebar-card">
+        <p className="sidebar-kicker">Profile Links</p>
+        <div className="profile-links">
+          {projectLinks.map(([label, href, Icon]) => (
+            <a
+              key={label}
+              href={href}
+              target={href.startsWith("mailto:") ? undefined : "_blank"}
+              rel={href.startsWith("mailto:") ? undefined : "noreferrer"}
+            >
+              <Icon size={16} />
+              {label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </aside>
   );
 }
 
@@ -732,16 +803,78 @@ function Explainability() {
 }
 
 function Footer() {
+  const quickLinks = [
+    ["Dashboard", "overview"],
+    ["Demand Forecasting", "forecast"],
+    ["Theft Detection", "alerts"],
+    ["Zone Intelligence", "zones"],
+    ["Meter Case", "case"],
+    ["Inspection Queue", "queue"],
+    ["Explainability", "explain"],
+  ];
+
   return (
     <footer className="simple-footer">
-      <div>
-        <strong>GridSense AI</strong>
-        <span>Smart Meter Intelligence and Revenue Recovery System for BESCOM</span>
+      <div className="footer-inner">
+        <div className="footer-brand-block">
+          <div className="footer-logo">
+            <Zap size={24} />
+          </div>
+          <div>
+            <strong>GridSense AI</strong>
+            <span>Smart Meter Intelligence and Revenue Recovery System for BESCOM</span>
+          </div>
+          <p>
+            Built for AI for Bharat Hackathon - Theme 8. GridSense AI transforms smart meter data into theft alerts,
+            demand forecasts, inspection priorities, explainable decisions, and revenue recovery actions.
+          </p>
+        </div>
+
+        <div className="footer-column">
+          <h3>Dashboard</h3>
+          {quickLinks.map(([label, id]) => (
+            <button key={id} type="button" onClick={() => scrollToId(id)}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="footer-column">
+          <h3>Built With</h3>
+          <div className="footer-stack">
+            {techStack.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="footer-column">
+          <h3>Project Links</h3>
+          {projectLinks.map(([label, href, Icon]) => (
+            <a
+              key={label}
+              href={href}
+              target={href.startsWith("mailto:") ? undefined : "_blank"}
+              rel={href.startsWith("mailto:") ? undefined : "noreferrer"}
+            >
+              <Icon size={16} />
+              {label}
+            </a>
+          ))}
+        </div>
       </div>
-      <p>
-        Prototype uses synthetic data only. Not an official BESCOM product. Built for hackathon demonstration and
-        decision-support research.
-      </p>
+
+      <div className="footer-bottom">
+        <div>
+          <strong>AI for Bharat Hackathon 2026</strong>
+          <span>Theme 8 - AI for Smart Meter Intelligence and Loss Detection by BESCOM</span>
+          <span>Prototype uses synthetic data only.</span>
+        </div>
+        <p>
+          (C) 2026 GridSense AI. Not an official BESCOM product. Built for hackathon demonstration and decision-support
+          research.
+        </p>
+      </div>
     </footer>
   );
 }
@@ -800,17 +933,20 @@ export default function App() {
   return (
     <div className="app-shell">
       <Header onSimulate={handleSimulate} onReset={handleReset} />
-      <main className="page">
-        <Notice simulated={simulated} />
-        <Overview simulated={simulated} onSimulate={handleSimulate} />
-        <DemandForecast simulated={simulated} />
-        <Alerts alerts={alerts} />
-        <ZoneStatus zones={zones} simulated={simulated} />
-        <MeterCase status={caseStatus} onStatus={updateCaseStatus} />
-        <RevenueImpact simulated={simulated} />
-        <InspectionQueue rows={queueRows} onDecision={updateDecision} />
-        <Explainability />
-      </main>
+      <div className="dashboard-shell">
+        <Sidebar onSimulate={handleSimulate} />
+        <main className="page">
+          <Notice simulated={simulated} />
+          <Overview simulated={simulated} onSimulate={handleSimulate} />
+          <DemandForecast simulated={simulated} />
+          <Alerts alerts={alerts} />
+          <ZoneStatus zones={zones} simulated={simulated} />
+          <MeterCase status={caseStatus} onStatus={updateCaseStatus} />
+          <RevenueImpact simulated={simulated} />
+          <InspectionQueue rows={queueRows} onDecision={updateDecision} />
+          <Explainability />
+        </main>
+      </div>
       <Footer />
     </div>
   );
