@@ -367,7 +367,7 @@ function Section({ id, step, title, intro, icon: Icon, children }) {
   );
 }
 
-function MetricCard({ label, value, note, icon: Icon, tone = "orange" }) {
+function MetricCard({ label, value, note, icon: Icon, tone = "blue" }) {
   return (
     <div className={`metric-card metric-${tone}`}>
       <div className="metric-top">
@@ -473,7 +473,7 @@ function DemandForecast({ simulated }) {
           <div className="card-title-row">
             <div>
               <h3>Actual vs Predicted Electricity Demand</h3>
-              <p>Hourly demand in MW. The orange area shows evening peak risk.</p>
+              <p>Hourly demand in MW. The highlighted area shows evening peak risk.</p>
             </div>
           </div>
           <div className="chart-height">
@@ -484,14 +484,14 @@ function DemandForecast({ simulated }) {
                 <YAxis stroke="#475569" fontSize={12} domain={[3, 10]} tickFormatter={(value) => `${value} MW`} />
                 <Tooltip />
                 <ReferenceArea x1="6 PM" x2="9 PM" fill="#fed7aa" fillOpacity={0.38} />
-                <Line type="monotone" dataKey="actual" stroke="#ea580c" strokeWidth={3} dot={{ r: 4 }} name="Actual demand" />
+                <Line type="monotone" dataKey="actual" stroke="#1d4ed8" strokeWidth={3} dot={{ r: 4 }} name="Actual demand" />
                 <Line type="monotone" dataKey="predicted" stroke="#059669" strokeWidth={3} strokeDasharray="7 6" dot={{ r: 4 }} name="Predicted demand" />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="plain-card orange-left">
+        <div className="plain-card blue-left">
           <h3>AI Insight</h3>
           <p>
             GridSense predicts a peak load between 7 PM and 9 PM in Zone B due to evening residential usage.
@@ -629,7 +629,7 @@ function MeterCase({ status, onStatus }) {
                 <XAxis dataKey="time" stroke="#475569" fontSize={12} />
                 <YAxis stroke="#475569" fontSize={12} />
                 <Tooltip />
-                <Line type="monotone" dataKey="normal" stroke="#ea580c" strokeWidth={3} name="Normal usage" />
+                <Line type="monotone" dataKey="normal" stroke="#1d4ed8" strokeWidth={3} name="Normal usage" />
                 <Line type="monotone" dataKey="current" stroke="#dc2626" strokeWidth={3} name="Current usage" />
                 <ReferenceDot x="2 PM" y={21} r={7} fill="#dc2626" stroke="#ffffff" strokeWidth={2} />
               </LineChart>
@@ -683,7 +683,7 @@ function RevenueImpact({ simulated }) {
                 <Tooltip formatter={(value) => [`Rs ${money.format(value)}`, "Estimated loss"]} />
                 <Bar dataKey="loss" radius={[6, 6, 0, 0]}>
                   {revenueLoss.map((entry) => (
-                    <Cell key={entry.zone} fill={entry.zone === "Zone C" ? "#dc2626" : "#f97316"} />
+                    <Cell key={entry.zone} fill={entry.zone === "Zone C" ? "#dc2626" : "#2563eb"} />
                   ))}
                 </Bar>
               </BarChart>
