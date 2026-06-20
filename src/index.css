@@ -38,6 +38,7 @@ body {
 
 .landing-page {
   min-height: 100vh;
+  background: #f0f4ff;
   background: var(--landing-bg);
   color: var(--landing-text);
   transition: background 0.3s ease, color 0.3s ease;
