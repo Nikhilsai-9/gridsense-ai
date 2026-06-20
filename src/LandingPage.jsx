@@ -21,6 +21,7 @@ import {
   TrendingUp,
   Leaf,
   CheckCircle2,
+  ClipboardCheck,
   ArrowRight,
   Play,
 } from "lucide-react";
