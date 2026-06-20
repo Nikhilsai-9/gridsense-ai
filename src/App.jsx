@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -26,6 +26,8 @@ import {
   Siren,
   UserCheck,
   Zap,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   Bar,
@@ -41,6 +43,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import LandingPage from "./LandingPage";
 
 const money = new Intl.NumberFormat("en-IN");
 
@@ -240,7 +243,7 @@ function statusClass(status) {
   return "tag-neutral";
 }
 
-function Header({ onSimulate, onReset }) {
+function Header({ onSimulate, onReset, darkMode, onToggleDarkMode, onBackToLanding }) {
   return (
     <header className="gov-header">
       <div className="gov-strip">
@@ -259,6 +262,18 @@ function Header({ onSimulate, onReset }) {
         </button>
 
         <div className="nav-actions">
+          <button type="button" className="secondary-btn" onClick={onBackToLanding}>
+            <ArrowRight size={16} style={{ transform: 'rotate(180deg)' }} />
+            Back to Landing
+          </button>
+          <button 
+            type="button" 
+            className="theme-toggle-btn"
+            onClick={onToggleDarkMode}
+            aria-label="Toggle theme"
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <button type="button" className="primary-btn" onClick={onSimulate}>
             <Siren size={16} />
             Simulate Theft
@@ -880,9 +895,20 @@ function Footer() {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [simulated, setSimulated] = useState(false);
   const [queueRows, setQueueRows] = useState(baseQueue);
   const [caseStatus, setCaseStatus] = useState("High Risk");
+
+  // Apply dark mode class to body
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [darkMode]);
 
   const alerts = useMemo(() => (simulated ? [liveAlert, ...baseAlerts] : baseAlerts), [simulated]);
 
@@ -930,9 +956,41 @@ export default function App() {
     setQueueRows((rows) => rows.map((row) => (row.meterId === "BES-2048" ? { ...row, status: queueStatus } : row)));
   };
 
+  const handleEnterDashboard = () => {
+    setShowLanding(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToLanding = () => {
+    setShowLanding(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleToggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Show landing page
+  if (showLanding) {
+    return (
+      <LandingPage 
+        onEnterDashboard={handleEnterDashboard}
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+      />
+    );
+  }
+
+  // Show dashboard
   return (
-    <div className="app-shell">
-      <Header onSimulate={handleSimulate} onReset={handleReset} />
+    <div className={`app-shell ${darkMode ? 'dark-mode' : ''}`}>
+      <Header 
+        onSimulate={handleSimulate} 
+        onReset={handleReset} 
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+        onBackToLanding={handleBackToLanding}
+      />
       <div className="dashboard-shell">
         <Sidebar onSimulate={handleSimulate} />
         <main className="page">
