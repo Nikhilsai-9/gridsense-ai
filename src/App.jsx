@@ -298,7 +298,7 @@ function Header({
           >
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <button type="button" className="primary-btn" onClick={onSimulate}>
+          <button type="button" className="primary-btn danger-action-btn" onClick={onSimulate}>
             <Siren size={16} />
             Simulate Theft
           </button>
@@ -337,7 +337,7 @@ function Sidebar({ onSimulate, activeStep, onNavigate, isOpen }) {
         </div>
         <h3>GridSense AI</h3>
         <p>Smart Meter Intelligence and Revenue Recovery System for BESCOM.</p>
-        <button type="button" className="primary-btn sidebar-demo-btn" onClick={onSimulate}>
+        <button type="button" className="primary-btn danger-action-btn sidebar-demo-btn" onClick={onSimulate}>
           <Siren size={16} />
           Simulate Theft
         </button>
@@ -447,7 +447,7 @@ function Overview({ simulated, onSimulate, onNavigate }) {
             and prioritize field inspections. The prototype uses synthetic data only.
           </p>
           <div className="intro-actions">
-            <button type="button" className="primary-btn" onClick={onSimulate}>
+            <button type="button" className="primary-btn danger-action-btn" onClick={onSimulate}>
               <Siren size={16} />
               Run Live Demo
             </button>
@@ -525,9 +525,9 @@ function DemandForecast({ simulated }) {
                 <XAxis dataKey="time" stroke="#475569" fontSize={12} />
                 <YAxis stroke="#475569" fontSize={12} domain={[3, 10]} tickFormatter={(value) => `${value} MW`} />
                 <Tooltip />
-                <ReferenceArea x1="6 PM" x2="9 PM" fill="#fed7aa" fillOpacity={0.38} />
-                <Line type="monotone" dataKey="actual" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} name="Actual demand" />
-                <Line type="monotone" dataKey="predicted" stroke="#059669" strokeWidth={3} strokeDasharray="7 6" dot={{ r: 4 }} name="Predicted demand" />
+                <ReferenceArea x1="6 PM" x2="9 PM" fill="#F5A623" fillOpacity={0.38} />
+                <Line type="monotone" dataKey="actual" stroke="#0EA5A8" strokeWidth={3} dot={{ r: 4 }} name="Actual demand" />
+                <Line type="monotone" dataKey="predicted" stroke="#2ECC71" strokeWidth={3} strokeDasharray="7 6" dot={{ r: 4 }} name="Predicted demand" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -671,9 +671,9 @@ function MeterCase({ status, onStatus }) {
                 <XAxis dataKey="time" stroke="#475569" fontSize={12} />
                 <YAxis stroke="#475569" fontSize={12} />
                 <Tooltip />
-                <Line type="monotone" dataKey="normal" stroke="#f59e0b" strokeWidth={3} name="Normal usage" />
-                <Line type="monotone" dataKey="current" stroke="#dc2626" strokeWidth={3} name="Current usage" />
-                <ReferenceDot x="2 PM" y={21} r={7} fill="#dc2626" stroke="#ffffff" strokeWidth={2} />
+                <Line type="monotone" dataKey="normal" stroke="#0EA5A8" strokeWidth={3} name="Normal usage" />
+                <Line type="monotone" dataKey="current" stroke="#E5484D" strokeWidth={3} name="Current usage" />
+                <ReferenceDot x="2 PM" y={21} r={7} fill="#E5484D" stroke="#ffffff" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -725,7 +725,7 @@ function RevenueImpact({ simulated }) {
                 <Tooltip formatter={(value) => [`Rs ${money.format(value)}`, "Estimated loss"]} />
                 <Bar dataKey="loss" radius={[6, 6, 0, 0]}>
                   {revenueLoss.map((entry) => (
-                    <Cell key={entry.zone} fill={entry.zone === "Zone C" ? "#dc2626" : "#f59e0b"} />
+                    <Cell key={entry.zone} fill={entry.zone === "Zone C" ? "#E5484D" : "#F5A623"} />
                   ))}
                 </Bar>
               </BarChart>

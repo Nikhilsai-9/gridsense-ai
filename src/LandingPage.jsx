@@ -85,12 +85,12 @@ const stats = [
 ];
 
 const techStack = [
-  { name: "React", color: "from-cyan-500 to-blue-500" },
-  { name: "Vite", color: "from-purple-500 to-pink-500" },
-  { name: "Tailwind CSS", color: "from-teal-500 to-emerald-500" },
-  { name: "Recharts", color: "from-orange-500 to-red-500" },
-  { name: "Framer Motion", color: "from-violet-500 to-purple-500" },
-  { name: "Lucide Icons", color: "from-blue-500 to-indigo-500" },
+  { name: "React" },
+  { name: "Vite" },
+  { name: "Tailwind CSS" },
+  { name: "Recharts" },
+  { name: "Framer Motion" },
+  { name: "Lucide Icons" },
 ];
 
 const requirements = [
@@ -205,17 +205,17 @@ export default function LandingPage({ onEnterDashboard, darkMode, onToggleDarkMo
             </div>
             <div className="preview-content">
               <div className="preview-metrics">
-                <div className="preview-metric">
+                <div className="preview-metric danger">
                   <span className="metric-icon"><AlertTriangle /></span>
                   <span className="metric-value">12</span>
                   <span className="metric-label">Active Alerts</span>
                 </div>
-                <div className="preview-metric">
+                <div className="preview-metric warning">
                   <span className="metric-icon"><TrendingUp /></span>
                   <span className="metric-value">₹2.3Cr</span>
                   <span className="metric-label">At Risk</span>
                 </div>
-                <div className="preview-metric">
+                <div className="preview-metric success">
                   <span className="metric-icon"><Shield /></span>
                   <span className="metric-value">94%</span>
                   <span className="metric-label">Accuracy</span>
@@ -360,7 +360,7 @@ export default function LandingPage({ onEnterDashboard, darkMode, onToggleDarkMo
                 className="tech-card"
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
-                <div className={`tech-badge ${tech.color}`}>
+                <div className="tech-badge">
                   {tech.name}
                 </div>
               </div>
