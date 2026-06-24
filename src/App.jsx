@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -26,6 +26,10 @@ import {
   Siren,
   UserCheck,
   Zap,
+  Sun,
+  Moon,
+  Menu,
+  X,
 } from "lucide-react";
 import {
   Bar,
@@ -41,6 +45,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import LandingPage from "./LandingPage";
 
 const money = new Intl.NumberFormat("en-IN");
 
@@ -210,8 +215,9 @@ const steps = [
   ["alerts", "3", "Theft Alerts"],
   ["zones", "4", "Zone Status"],
   ["case", "5", "Meter Case"],
-  ["queue", "6", "Inspection Queue"],
-  ["explain", "7", "AI Explanation"],
+  ["revenue", "6", "Revenue Impact"],
+  ["queue", "7", "Inspection Queue"],
+  ["explain", "8", "AI Explanation"],
 ];
 
 const projectLinks = [
@@ -240,25 +246,58 @@ function statusClass(status) {
   return "tag-neutral";
 }
 
-function Header({ onSimulate, onReset }) {
+function Header({
+  onSimulate,
+  onReset,
+  darkMode,
+  onToggleDarkMode,
+  onBackToLanding,
+  onToggleSidebar,
+  sidebarOpen,
+  onNavigate,
+  activeStepLabel,
+}) {
   return (
     <header className="gov-header">
       <div className="gov-strip">
         <span>Prototype for AI for Bharat Hackathon</span>
-        <span>Theme 8: Smart Meter Intelligence and Loss Detection</span>
+        <span>{activeStepLabel} | Theme 8: Smart Meter Intelligence and Loss Detection</span>
       </div>
       <div className="gov-nav">
-        <button type="button" className="brand" onClick={() => scrollToId("overview")} aria-label="Go to overview">
-          <span className="brand-icon">
-            <Zap size={23} />
-          </span>
-          <span>
-            <strong>GridSense AI</strong>
-            <small>BESCOM Smart Meter Intelligence Dashboard</small>
-          </span>
-        </button>
+        <div className="brand-cluster">
+          <button
+            type="button"
+            className="sidebar-toggle-btn"
+            onClick={onToggleSidebar}
+            aria-label={sidebarOpen ? "Hide dashboard sidebar" : "Show dashboard sidebar"}
+            aria-pressed={sidebarOpen}
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <button type="button" className="brand" onClick={() => onNavigate("overview")} aria-label="Go to overview">
+            <span className="brand-icon">
+              <Zap size={23} />
+            </span>
+            <span>
+              <strong>GridSense AI</strong>
+              <small>BESCOM Smart Meter Intelligence Dashboard</small>
+            </span>
+          </button>
+        </div>
 
         <div className="nav-actions">
+          <button type="button" className="secondary-btn" onClick={onBackToLanding}>
+            <ArrowRight size={16} style={{ transform: "rotate(180deg)" }} />
+            Back to Landing
+          </button>
+          <button
+            type="button"
+            className="theme-toggle-btn"
+            onClick={onToggleDarkMode}
+            aria-label="Toggle theme"
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <button type="button" className="primary-btn" onClick={onSimulate}>
             <Siren size={16} />
             Simulate Theft
@@ -272,15 +311,19 @@ function Header({ onSimulate, onReset }) {
     </header>
   );
 }
-
-function Sidebar({ onSimulate }) {
+function Sidebar({ onSimulate, activeStep, onNavigate, isOpen }) {
   return (
-    <aside className="left-sidebar" aria-label="Dashboard information and navigation">
+    <aside className={`left-sidebar ${isOpen ? "is-open" : "is-closed"}`} aria-label="Dashboard information and navigation">
       <div className="sidebar-card">
         <p className="sidebar-kicker">Dashboard Flow</p>
         <nav className="sidebar-nav" aria-label="Dashboard steps">
           {steps.map(([id, number, label]) => (
-            <button key={id} type="button" onClick={() => scrollToId(id)}>
+            <button
+              key={id}
+              type="button"
+              className={activeStep === id ? "active" : ""}
+              onClick={() => onNavigate(id)}
+            >
               <span>{number}</span>
               {label}
             </button>
@@ -337,7 +380,6 @@ function Sidebar({ onSimulate }) {
     </aside>
   );
 }
-
 function Notice({ simulated }) {
   if (!simulated) return null;
   return (
@@ -380,7 +422,7 @@ function MetricCard({ label, value, note, icon: Icon, tone = "blue" }) {
   );
 }
 
-function Overview({ simulated, onSimulate }) {
+function Overview({ simulated, onSimulate, onNavigate }) {
   const highRisk = simulated ? 21 : 18;
   const loss = simulated ? "Rs 2.62L" : "Rs 2.40L";
   const confidence = simulated ? "94%" : "92%";
@@ -409,7 +451,7 @@ function Overview({ simulated, onSimulate }) {
               <Siren size={16} />
               Run Live Demo
             </button>
-            <button type="button" className="secondary-btn" onClick={() => scrollToId("alerts")}>
+            <button type="button" className="secondary-btn" onClick={() => onNavigate("alerts")}>
               View Alerts
               <ArrowRight size={16} />
             </button>
@@ -484,7 +526,7 @@ function DemandForecast({ simulated }) {
                 <YAxis stroke="#475569" fontSize={12} domain={[3, 10]} tickFormatter={(value) => `${value} MW`} />
                 <Tooltip />
                 <ReferenceArea x1="6 PM" x2="9 PM" fill="#fed7aa" fillOpacity={0.38} />
-                <Line type="monotone" dataKey="actual" stroke="#1d4ed8" strokeWidth={3} dot={{ r: 4 }} name="Actual demand" />
+                <Line type="monotone" dataKey="actual" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} name="Actual demand" />
                 <Line type="monotone" dataKey="predicted" stroke="#059669" strokeWidth={3} strokeDasharray="7 6" dot={{ r: 4 }} name="Predicted demand" />
               </LineChart>
             </ResponsiveContainer>
@@ -508,7 +550,7 @@ function DemandForecast({ simulated }) {
   );
 }
 
-function Alerts({ alerts }) {
+function Alerts({ alerts, onNavigate }) {
   return (
     <Section
       id="alerts"
@@ -542,7 +584,7 @@ function Alerts({ alerts }) {
             <div className="confidence-bar" aria-label={`AI confidence ${alert.confidence}%`}>
               <span style={{ width: `${alert.confidence}%` }} />
             </div>
-            <button type="button" className="review-btn" onClick={() => scrollToId("case")}>
+            <button type="button" className="review-btn" onClick={() => onNavigate("case")}>
               Review Case
             </button>
           </article>
@@ -629,7 +671,7 @@ function MeterCase({ status, onStatus }) {
                 <XAxis dataKey="time" stroke="#475569" fontSize={12} />
                 <YAxis stroke="#475569" fontSize={12} />
                 <Tooltip />
-                <Line type="monotone" dataKey="normal" stroke="#1d4ed8" strokeWidth={3} name="Normal usage" />
+                <Line type="monotone" dataKey="normal" stroke="#f59e0b" strokeWidth={3} name="Normal usage" />
                 <Line type="monotone" dataKey="current" stroke="#dc2626" strokeWidth={3} name="Current usage" />
                 <ReferenceDot x="2 PM" y={21} r={7} fill="#dc2626" stroke="#ffffff" strokeWidth={2} />
               </LineChart>
@@ -658,7 +700,7 @@ function RevenueImpact({ simulated }) {
     <section className="section compact-section" id="revenue">
       <div className="section-heading">
         <div>
-          <p className="step-label">Financial View</p>
+          <p className="step-label">Step 6</p>
           <h2>Revenue Loss Estimation</h2>
           <p>The dashboard converts suspicious readings into estimated loss and recovery priority.</p>
         </div>
@@ -683,7 +725,7 @@ function RevenueImpact({ simulated }) {
                 <Tooltip formatter={(value) => [`Rs ${money.format(value)}`, "Estimated loss"]} />
                 <Bar dataKey="loss" radius={[6, 6, 0, 0]}>
                   {revenueLoss.map((entry) => (
-                    <Cell key={entry.zone} fill={entry.zone === "Zone C" ? "#dc2626" : "#2563eb"} />
+                    <Cell key={entry.zone} fill={entry.zone === "Zone C" ? "#dc2626" : "#f59e0b"} />
                   ))}
                 </Bar>
               </BarChart>
@@ -699,7 +741,7 @@ function InspectionQueue({ rows, onDecision }) {
   return (
     <Section
       id="queue"
-      step="6"
+      step="7"
       title="Inspection Priority Queue"
       intro="This is the officer workflow. AI recommends cases, but the final decision remains with authorized staff."
       icon={ClipboardCheck}
@@ -758,7 +800,7 @@ function Explainability() {
   return (
     <Section
       id="explain"
-      step="7"
+      step="8"
       title="Explainable AI and Audit Trail"
       intro="For public systems, officers must know why AI made a recommendation. This section makes the decision transparent."
       icon={FileCheck2}
@@ -802,13 +844,14 @@ function Explainability() {
   );
 }
 
-function Footer() {
+function Footer({ onNavigate }) {
   const quickLinks = [
     ["Dashboard", "overview"],
     ["Demand Forecasting", "forecast"],
     ["Theft Detection", "alerts"],
     ["Zone Intelligence", "zones"],
     ["Meter Case", "case"],
+    ["Revenue Impact", "revenue"],
     ["Inspection Queue", "queue"],
     ["Explainability", "explain"],
   ];
@@ -833,7 +876,7 @@ function Footer() {
         <div className="footer-column">
           <h3>Dashboard</h3>
           {quickLinks.map(([label, id]) => (
-            <button key={id} type="button" onClick={() => scrollToId(id)}>
+            <button key={id} type="button" onClick={() => onNavigate(id)}>
               {label}
             </button>
           ))}
@@ -880,9 +923,21 @@ function Footer() {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [simulated, setSimulated] = useState(false);
   const [queueRows, setQueueRows] = useState(baseQueue);
   const [caseStatus, setCaseStatus] = useState("High Risk");
+  const [activeStep, setActiveStep] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
 
   const alerts = useMemo(() => (simulated ? [liveAlert, ...baseAlerts] : baseAlerts), [simulated]);
 
@@ -901,17 +956,22 @@ export default function App() {
     [simulated],
   );
 
+  const navigateToStep = (stepId) => {
+    setActiveStep(stepId);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSimulate = () => {
     setSimulated(true);
     setQueueRows((rows) => (rows.some((row) => row.meterId === liveQueueCase.meterId) ? rows : [liveQueueCase, ...rows]));
-    setTimeout(() => scrollToId("alerts"), 150);
+    navigateToStep("alerts");
   };
 
   const handleReset = () => {
     setSimulated(false);
     setQueueRows(baseQueue);
     setCaseStatus("High Risk");
-    setTimeout(() => scrollToId("overview"), 150);
+    navigateToStep("overview");
   };
 
   const updateDecision = (meterId, status) => {
@@ -930,24 +990,89 @@ export default function App() {
     setQueueRows((rows) => rows.map((row) => (row.meterId === "BES-2048" ? { ...row, status: queueStatus } : row)));
   };
 
+  const handleEnterDashboard = () => {
+    setShowLanding(false);
+    navigateToStep("overview");
+  };
+
+  const handleBackToLanding = () => {
+    setShowLanding(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleToggleDarkMode = () => {
+    setDarkMode((current) => !current);
+  };
+
+  const activeStepIndex = Math.max(0, steps.findIndex(([id]) => id === activeStep));
+  const activeStepLabel = steps[activeStepIndex]?.[2] ?? "Overview";
+  const previousStep = steps[activeStepIndex - 1]?.[0];
+  const nextStep = steps[activeStepIndex + 1]?.[0];
+  const currentStepNumber = steps[activeStepIndex]?.[1] ?? "1";
+
+  const dashboardPages = {
+    overview: <Overview simulated={simulated} onSimulate={handleSimulate} onNavigate={navigateToStep} />,
+    forecast: <DemandForecast simulated={simulated} />,
+    alerts: <Alerts alerts={alerts} onNavigate={navigateToStep} />,
+    zones: <ZoneStatus zones={zones} simulated={simulated} />,
+    case: <MeterCase status={caseStatus} onStatus={updateCaseStatus} />,
+    revenue: <RevenueImpact simulated={simulated} />,
+    queue: <InspectionQueue rows={queueRows} onDecision={updateDecision} />,
+    explain: <Explainability />,
+  };
+
+  if (showLanding) {
+    return (
+      <LandingPage
+        onEnterDashboard={handleEnterDashboard}
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+      />
+    );
+  }
+
   return (
-    <div className="app-shell">
-      <Header onSimulate={handleSimulate} onReset={handleReset} />
-      <div className="dashboard-shell">
-        <Sidebar onSimulate={handleSimulate} />
-        <main className="page">
+    <div className={`app-shell ${darkMode ? "dark-mode" : ""}`}>
+      <Header
+        onSimulate={handleSimulate}
+        onReset={handleReset}
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+        onBackToLanding={handleBackToLanding}
+        onToggleSidebar={() => setSidebarOpen((open) => !open)}
+        sidebarOpen={sidebarOpen}
+        onNavigate={navigateToStep}
+        activeStepLabel={activeStepLabel}
+      />
+      <div className={`dashboard-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
+        <Sidebar
+          onSimulate={handleSimulate}
+          activeStep={activeStep}
+          onNavigate={navigateToStep}
+          isOpen={sidebarOpen}
+        />
+        <main className="page dashboard-page">
           <Notice simulated={simulated} />
-          <Overview simulated={simulated} onSimulate={handleSimulate} />
-          <DemandForecast simulated={simulated} />
-          <Alerts alerts={alerts} />
-          <ZoneStatus zones={zones} simulated={simulated} />
-          <MeterCase status={caseStatus} onStatus={updateCaseStatus} />
-          <RevenueImpact simulated={simulated} />
-          <InspectionQueue rows={queueRows} onDecision={updateDecision} />
-          <Explainability />
+          <div className="dashboard-page-toolbar">
+            <div>
+              <span>Step {currentStepNumber} of {steps.length}</span>
+              <strong>{activeStepLabel}</strong>
+            </div>
+            <div className="page-switcher">
+              <button type="button" className="secondary-btn" onClick={() => previousStep && navigateToStep(previousStep)} disabled={!previousStep}>
+                Previous
+              </button>
+              <button type="button" className="primary-btn" onClick={() => nextStep && navigateToStep(nextStep)} disabled={!nextStep}>
+                Next
+              </button>
+            </div>
+          </div>
+          <div className="dashboard-step-page" key={activeStep}>
+            {dashboardPages[activeStep] ?? dashboardPages.overview}
+          </div>
         </main>
       </div>
-      <Footer />
+      <Footer onNavigate={navigateToStep} />
     </div>
   );
 }
